@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/">HOME</a>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="/realTimeProducts">Admin</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/chat">Chat</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+    {{#if user}}
+            <div><a href="/current" class="btn btn-info">Profile</a></div>
+            <div><a href="/api/carts/{{user.cart}}" class="btn btn-info">Cart</a> </div>
+            {{else}}
+            <a href="/login" class="btn btn-info">Login</a>
+    {{/if}}
+</nav>

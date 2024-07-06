@@ -1,0 +1,13 @@
+
+<div class="text-center">   
+    <h2>Perfil de Usuario</h2>
+    <p>Nombre: {{user.first_name}}</p>
+    <p>Apellido: {{user.last_name}}</p>
+    <p>Email: {{user.email}}</p>
+    <p>Edad: {{user.age}}</p>
+    <p>Tu carrito: {{user.cart}}</p>
+    <form action="/api/sessions/logout" method="POST">
+        <button class="btn btn-info"  type="submit">Logout</button>
+        <a class="btn btn-info" href="/">Shop</a>
+    </form>
+</div>

@@ -1,0 +1,60 @@
+<body>
+    <div id="cart" data-cart-id="{{cart._id}}" class="container mt-5">
+        <h3 class="text-center">Carrito ID: {{cart._id}}</h3>
+        {{#if cart.items.length}}
+            <div class="row mt-4">
+                <div class="col">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th scope="col"></th>
+                                <th scope="col">Producto</th>
+                                <th scope="col">Descripción</th>
+                                <th scope="col">Precio</th>
+                                <th scope="col">Cantidad</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {{#each cart.items}}
+                            <tr>
+                                <td>
+                                    <a href="/products/{{productId._id}}">
+                                        <img class="cartImage" src="{{this.productId.thumbnail}}" alt="{{this.productId.description}}">
+                                    </a>
+                                    
+                                </td>
+                                <td>{{this.productId.title}}</td>
+                                <td>{{this.productId.description}}</td>
+                                <td>${{this.productId.price}}</td>
+                                <td>
+                                    <div class="btn-group" role="group" aria-label="Basic example">
+                                        <span class="mx-2">{{this.quantity}}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <button type="button" class="btn btn-danger" onclick="removeFromCart('{{../cart._id}}', '{{this.productId._id}}')">Eliminar</button>
+                                </td>
+                            </tr>
+                            {{/each}}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col text-end">
+                    <a class="btn btn-info" href="/">Seguir Comprando...</a>
+                </div>
+                <div class="col text-end">
+                    <button class="btn btn-danger" onclick="emptyCart('{{cart._id}}')">Vaciar carrito</button>
+                </div>
+            </div>
+        {{else}}
+            <div class="col text-end">
+                <h2 class="text-center mt-4">No tienes productos en tu carrito </h2>
+                <a class="btn btn-info" href="/">Seguir Comprando...</a>
+            </div>
+        {{/if}}
+    </div> 
+    <script src="/js/cart.js"></script>
+</body>
