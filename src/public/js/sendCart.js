@@ -1,4 +1,4 @@
-let cartId; // Variable global para almacenar el ID del carrito
+let cartId
 
 document.addEventListener('DOMContentLoaded', async () => {
     try {
@@ -11,11 +11,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
-        const data = await response.json();
-        if (data.user && data.user.cart) {
-            cartId = data.user.cart; // Inicializar `cartId` con el valor del carrito en la sesión
+        if (response.ok) {
+            const data = await response.json();
+            if (data.user && data.user.cart) {
+                cartId = data.user.cart; // Asignar `cartId` con el valor del carrito en la sesión del usuario
+            } else {
+                console.error('Carrito no encontrado en la sesión del usuario');
+            }
         } else {
-            console.error('Carrito no encontrado en la sesión del usuario');
+            console.error('Error al obtener el carrito de la sesión del usuario:', response.statusText);
         }
     } catch (error) {
         console.error('Error al obtener el carrito de la sesión del usuario:', error);
@@ -42,12 +46,17 @@ async function fetchProducts(page = 1) {
     url.searchParams.set('page', page);
     url.searchParams.set('limit', limit);
 
-    const response = await fetch(url);
-    const data = await response.json();
-
-    products = data.payload;
-    renderProducts(products);
-    renderPagination(data);
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error fetching products: ${response.statusText}`);
+        }
+        const data = await response.json();
+        renderProducts(data.payload);
+        renderPagination(data);
+    } catch (error) {
+        console.error('Error fetching products:', error);
+    }
 }
 
 function renderProducts(products) {
@@ -67,7 +76,7 @@ function renderProducts(products) {
                             <li><i class="bi bi-currency-dollar"></i> Price: $${product.price}</li>
                             <li><i class="bi bi-check-circle"></i> Status: ${product.status}</li>
                             <li>
-                                </i><img src="${product.thumbnail}" alt="${product.title}" class="img-fluid mt-2">
+                                <img src="${product.thumbnail || 'default-image.jpg'}" alt="${product.title}" class="img-fluid mt-2">
                             </li>
                         </ul>
                         <div class="text-center mt-3">
@@ -82,8 +91,42 @@ function renderProducts(products) {
     });
 
     document.querySelectorAll('.product').forEach(button => {
-        button.addEventListener('click', addToCart);
+        button.addEventListener('click', () => {
+
+            if (cartId) {
+                addToCart(cartId, button.id, 1); // Pasar los parámetros correctos a `addToCart`
+            } else {
+                Swal.fire('Error', 'Carrito no encontrado', 'error');
+            }
+        });
     });
+}
+
+async function addToCart(cartId, productId, quantity) {
+    try {
+        //console.log("Cart ID:", cartId); // Agregar estos logs para verificar los valores
+        //console.log("Product ID:", productId);
+
+        const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ quantity }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        //console.log("Response data:", data);
+
+        Swal.fire('Producto añadido', 'El producto ha sido añadido al carrito', 'success');
+    } catch (error) {
+        console.error('Error al añadir el producto al carrito:', error);
+        Swal.fire('Error', 'No se pudo añadir el producto al carrito', 'error');
+    }
 }
 
 function renderPagination(data) {
@@ -92,109 +135,6 @@ function renderPagination(data) {
 
     const prevPage = data.hasPrevPage ? `<a href="#" onclick="fetchProducts(${data.prevPage}); return false;" class="btn btn-primary">Prev Page</a>` : `<span class="btn btn-secondary disabled">Prev Page</span>`;
     const nextPage = data.hasNextPage ? `<a href="#" onclick="fetchProducts(${data.nextPage}); return false;" class="btn btn-primary">Next Page</a>` : `<span class="btn btn-secondary disabled">Next Page</span>`;
-    
-    pagination.innerHTML = `
-        ${prevPage}
-        <span>Page ${data.page} of ${data.totalPages}</span>
-        ${nextPage}
-    `;
-}
 
-async function addToCart(event) {
-    const productId = event.target.id;
-    const stock = Number(event.target.getAttribute('data-value'));
-    const { value: quantity } = await Swal.fire({
-        title: 'Add quantity',
-        input: 'number',
-        inputAttributes: {
-            autocapitalize: 'off'
-        },
-        showCancelButton: true,
-        confirmButtonText: 'Confirm',
-    });
-
-    if (quantity !== null) {
-        const quantityNumber = Number(quantity);
-        if (quantityNumber > 0 && stock >= quantityNumber) {
-            try {
-                const response = await fetch(`/api/carts/${cartId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ "productId": productId, "quantity": quantityNumber }),
-                });
-                if (response.ok) {
-                    Swal.fire({
-                        title: 'Product added successfully',
-                        text: `ID: ${productId} - Quantity: ${quantityNumber}`,
-                        icon: 'success',
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: 'There was an error adding the product to the cart',
-                        icon: 'error',
-                    });
-                }
-            } catch (error) {
-                console.error('Error al agregar el producto al carrito:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: 'There was an error adding the product to the cart',
-                    icon: 'error',
-                });
-            }
-        } else if (quantityNumber <= 0) {
-            Swal.fire({
-                title: 'Quantity must be greater than 0',
-                icon: 'warning',
-            });
-        } else {
-            Swal.fire({
-                title: 'Quantity cannot be greater than stock',
-                icon: 'error',
-            });
-        }
-    }
-}
-
-function showProductDetails(productId) {
-    const product = products.find(product => product._id === productId);
-    if (product) {
-        displayProductDetailsModal(product);
-    } else {
-        console.error("Producto no encontrado en la lista de productos recibidos");
-    }
-}
-
-function displayProductDetailsModal(product) {
-    const modalTitle = document.getElementById('modalTitle');
-    modalTitle.textContent = product.title;
-
-    const modalBody = document.getElementById('modalBody');
-    modalBody.innerHTML = `
-        <p><strong>Descripción:</strong> ${product.description}</p>
-        <p><strong>Precio:</strong> $${product.price}</p>
-        <p><strong>ID:</strong> ${product._id}</p>
-        <p><strong>Categoria:</strong> ${product.category}</p>
-        <p><strong>Stock:</strong> ${product.stock}</p>
-        <img src="${product.thumbnail}" alt="${product.title}" class="img-fluid">
-    `;
-
-    const productModal = new bootstrap.Modal(document.getElementById('productModal'));
-    productModal.show();
-
-    // Cerrar el modal cuando el botón de cerrar es presionado
-    document.querySelector('.btn-close').addEventListener('click', () => {
-        productModal.hide();
-    });
-
-    // Asegurarse de que el modal se oculta correctamente
-    productModal._element.addEventListener('hidden.bs.modal', () => {
-        const modalBackdrop = document.querySelector('.modal-backdrop');
-        if (modalBackdrop) {
-            modalBackdrop.remove();
-        }
-    });
+    pagination.innerHTML = `${prevPage} ${nextPage}`;
 }

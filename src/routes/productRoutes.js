@@ -1,8 +1,8 @@
-import { Router } from "express";
-import ProductManager from "../Dao/mongomanagers/productManagerMongo.js";
+import { Router } from 'express';
+import ProductManager from '../controllers/productController.js';
 
-const manager = new ProductManager();
 const router = Router();
+const productController = new ProductManager();
 
 router.get('/products', async (req, res) => {
     try {
@@ -25,7 +25,7 @@ router.get('/products', async (req, res) => {
             filter.status = availability === 'available' ? true : false;
         }
 
-        const products = await manager.getProducts(filter, options);
+        const products = await productController.getProducts(filter, options);
 
         res.status(200).json({
             status: 'success',
@@ -38,48 +38,44 @@ router.get('/products', async (req, res) => {
             hasNextPage: products.hasNextPage
         });
     } catch (error) {
-        console.log(error);
+        //console.log(error);
         res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
     }
 });
 
-router.get("/products/:pid", async (req, res) => {
+router.get('/products/:pid', async (req, res) => {
     try {
-        const productfind = await manager.getProductById(req.params.pid);
-        res.status(200).json({ status: "success", productfind });
+        const product = await productController.getProductById(req.params.pid);
+        res.status(200).json({ status: 'success', product });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Internal Server Error", error: error.message });
+        res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
     }
 });
 
-router.post("/products", async (req, res) => {
+router.post('/products', async (req, res) => {
     try {
-        const obj = req.body;
-        const newproduct = await manager.addProduct(obj);
-        res.status(201).json({ status: "success", newproduct });
+        const newProduct = await productController.addProduct(req.body);
+        res.status(201).json({ status: 'success', newProduct });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Internal Server Error", error: error.message });
+        res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
     }
 });
 
-router.put("/products/:pid", async (req, res) => {
+router.put('/products/:pid', async (req, res) => {
     try {
-        const pid = req.params.pid;
-        const obj = req.body;
-        const updatedproduct = await manager.updateProduct(pid, obj);
-        res.status(200).json({ status: "success", updatedproduct });
+        const updatedProduct = await productController.updateProduct(req.params.pid, req.body);
+        res.status(200).json({ status: 'success', updatedProduct });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Internal Server Error", error: error.message });
+        res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
     }
 });
 
-router.delete("/products/:pid", async (req, res) => {
+router.delete('/products/:pid', async (req, res) => {
     try {
-        const id = req.params.pid;
-        const deleteproduct = await manager.deleteProduct(id);
-        res.status(200).json({ status: "success", deleteProduct: deleteproduct });
+        const deleteProduct = await productController.deleteProduct(req.params.pid);
+        res.status(200).json({ status: 'success', deleteProduct });
     } catch (error) {
-        res.status(500).json({ status: "error", message: "Internal Server Error", error: error.message });
+        res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
     }
 });
 

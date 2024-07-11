@@ -1,4 +1,4 @@
-import MessageManager from "../Dao/mongomanagers/messageManagerMongo.js";
+import MessageManager from "../Dao/messageManagerMongo.js";
 const mm = new MessageManager();
 
 const socketChat = (socketServer) => {

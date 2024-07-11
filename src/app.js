@@ -1,62 +1,73 @@
-import express from "express";
-import { __dirname } from "./utils.js";
-import handlebars from "express-handlebars";
-import { Server } from "socket.io";
-import session from "express-session";
-import MongoStore from "connect-mongo";
-import passport from "passport";
-import bodyParser from "body-parser";
+import express from 'express';
+import { __dirname } from './utils.js';
+import handlebars from 'express-handlebars';
+import { Server } from 'socket.io';
+import session from 'express-session';
+import MongoStore from 'connect-mongo';
+import passport from 'passport';
+import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
-import productRoutes from "./routes/productRoutes.js";
-import cartRouter from "./routes/cartRoutes.js";
-import viewsRoutes from "./routes/viewsRoutes.js";
-import sessionsRouter from "./routes/sessions.js";
+import productRoutes from './routes/productRoutes.js';
+import cartRoutes from './routes/cartRoutes.js';
+import viewsRoutes from './routes/viewsRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
-import initializePassport from "./config/passport.config.js";
-import connectToDB from "./config/configServer.js";
+import initializePassport from './config/passport.config.js';
+import connectToDB from './config/configServer.js';
 
-import socketProducts from "./listener/socketProducts.js";
-import socketChat from "./listener/socketChat.js";
+import socketProducts from './listener/socketProducts.js';
+import socketChat from './listener/socketChat.js';
 
+dotenv.config();
+connectToDB();
 
 const app = express();
 const PORT = 8080;
 
 app.use(session({
-    secret: 'secretkey',
+    secret: process.env.SESSION_SECRET || 'secretkey',
     resave: false,
-    saveUninitialized: true,
-    store: MongoStore.create({ mongoUrl: "mongodb+srv://Dante:1985112aA.@cluster0.dr7thbm.mongodb.net/ecommerce?retryWrites=true&w=majority&appName=Cluster0" }),
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGODB_URI }),
 }));
 
-initializePassport();
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(__dirname + "/public"));
+app.use(express.static(__dirname + '/public'));
 
-// handlebars
-app.engine("handlebars", handlebars.engine());
-app.set("views", __dirname + "/views");
-app.set("view engine", "handlebars");
-
-// rutas
-app.use("/api", productRoutes);
-app.use("/api/carts", cartRouter);
-app.use('/', viewsRoutes);
-app.use('/api/sessions', sessionsRouter);
-
-const httpServer = app.listen(PORT, () => {
-    try {
-        console.log(`Listening to the port ${PORT}`);
-    } catch (err) {
-        console.log(err);
-    }
+// Middleware para pasar la información del usuario a las vistas
+app.use((req, res, next) => {
+    res.locals.user = req.user || null;
+    next();
 });
 
-connectToDB();
+// Configuración de handlebars
+const hbs = handlebars.create({
+    runtimeOptions: {
+        allowProtoPropertiesByDefault: true,
+        allowProtoMethodsByDefault: true,
+    }
+});
+app.engine('handlebars', hbs.engine);
+app.set('view engine', 'handlebars');
+
+app.set('views', __dirname + '/views');
+
+// Rutas
+app.use('/api', productRoutes);
+app.use('/api/carts', cartRoutes);
+app.use('/', viewsRoutes);
+app.use('/api/sessions', userRoutes);
+
+initializePassport();
+const httpServer = app.listen(PORT, () => {
+    console.log(`Listening to the port ${PORT}`);
+});
+
 const socketServer = new Server(httpServer);
 
 socketProducts(socketServer);
