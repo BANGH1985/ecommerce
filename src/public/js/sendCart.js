@@ -14,7 +14,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (response.ok) {
             const data = await response.json();
             if (data.user && data.user.cart) {
-                cartId = data.user.cart; // Asignar `cartId` con el valor del carrito en la sesión del usuario
+                cartId = data.user.cart; 
+                //console.log(cartId);
             } else {
                 console.error('Carrito no encontrado en la sesión del usuario');
             }
@@ -122,7 +123,7 @@ async function addToCart(cartId, productId, quantity) {
         }
 
         const data = await response.json();
-        console.log("Response data:", data);
+        //console.log("Response data:", data);
 
         Swal.fire('Producto añadido', 'El producto ha sido añadido al carrito', 'success');
     } catch (error) {

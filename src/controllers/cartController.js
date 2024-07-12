@@ -1,11 +1,11 @@
-import CartManager from '../Dao/cartManagerMongo.js';
+import CartService from '../services/cartService.js';
 
-const cartManager = new CartManager();
+const cartService = new CartService();
 
 export default class CartController {
     async createCart(req, res) {
         try {
-            const newCart = await cartManager.createCart();
+            const newCart = await cartService.createCart();
             res.status(201).json(newCart);
         } catch (error) {
             console.error('Error al crear el carrito:', error);
@@ -16,13 +16,11 @@ export default class CartController {
     async getCartById(req, res) {
         try {
             const cartId = req.user.cart._id;
-            const cart = await cartManager.getCartById(cartId);
-            //console.log(cart);
-            if (cart) {
-                res.render('cart', { cart });
-            } else {
-                res.status(404).json({ error: 'Carrito no encontrado' });
+            const cart = await cartService.getCartById(cartId);
+            if (!cart) {
+                return res.status(404).json({ error: 'Carrito no encontrado' });
             }
+            res.render('cart', { cart });
         } catch (error) {
             console.error('Error al obtener el carrito:', error);
             res.status(500).json({ error: 'Error al obtener el carrito' });
@@ -33,30 +31,30 @@ export default class CartController {
         try {
             const { cid, pid } = req.params;
             const { quantity } = req.body;
-            const updatedCart = await cartManager.addItemToCart(cid, pid, quantity);
-            res.json(updatedCart);
+            const updatedCart = await cartService.addItemToCart(cid, pid, quantity);
+            res.status(200).json(updatedCart);
         } catch (error) {
-            console.error('Error al agregar el producto al carrito:', error);
-            res.status(500).json({ error: 'Error al agregar el producto al carrito' });
+            console.error('Error al agregar el artículo al carrito:', error);
+            res.status(500).json({ error: 'Error al agregar el artículo al carrito' });
         }
     }
 
     async removeItemFromCart(req, res) {
         try {
-            const { cid, pid } = req.params;
-            const updatedCart = await cartManager.removeItemFromCart(cid, pid);
-            res.json(updatedCart);
+            const { cartId, productId } = req.params;
+            const updatedCart = await cartService.removeItemFromCart(cartId, productId);
+            res.status(200).json(updatedCart);
         } catch (error) {
-            console.error('Error al eliminar el producto del carrito:', error);
-            res.status(500).json({ error: 'Error al eliminar el producto del carrito' });
+            console.error('Error al eliminar el artículo del carrito:', error);
+            res.status(500).json({ error: 'Error al eliminar el artículo del carrito' });
         }
     }
 
     async clearCart(req, res) {
         try {
-            const { cid } = req.params;
-            const clearedCart = await cartManager.clearCart(cid);
-            res.json(clearedCart);
+            const { cartId } = req.params;
+            const clearedCart = await cartService.clearCart(cartId);
+            res.status(200).json(clearedCart);
         } catch (error) {
             console.error('Error al vaciar el carrito:', error);
             res.status(500).json({ error: 'Error al vaciar el carrito' });
@@ -65,12 +63,12 @@ export default class CartController {
 
     async purchaseCart(req, res) {
         try {
-            const { cid } = req.params;
-            const purchaseResult = await cartManager.purchaseCart(cid);
-            res.json(purchaseResult);
+            const { cartId } = req.params;
+            const purchaseResult = await cartService.purchaseCart(cartId);
+            res.status(200).json(purchaseResult);
         } catch (error) {
-            console.error('Error al procesar la compra del carrito:', error);
-            res.status(500).json({ error: 'Error al procesar la compra del carrito' });
+            console.error('Error al realizar la compra del carrito:', error);
+            res.status(500).json({ error: 'Error al realizar la compra del carrito' });
         }
     }
 }

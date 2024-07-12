@@ -15,7 +15,7 @@ export default class CartManager {
 
     async getCartById(cartId) {
         try {
-            const cart = await Cart.findById(cartId).lean();
+            const cart = await Cart.findById(cartId).populate("items.productId").lean();
             return cart;
         } catch (error) {
             console.error('Error al obtener el carrito por ID:', error.message);
@@ -25,9 +25,9 @@ export default class CartManager {
 
     async addItemToCart(cartId, productId, quantity) {
         try {
-            console.log(cartId);
+            //console.log(cartId);
             const cart = await Cart.findById(cartId);
-            console.log(cart);
+            //console.log(cart);
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
@@ -47,8 +47,8 @@ export default class CartManager {
             await cart.save();
             return cart;
         } catch (error) {
-            //console.error('Error al agregar el producto al carrito:', error);
-            //throw error;
+            console.error('Error al agregar el producto al carrito:', error);
+            throw error;
         }
     }
 

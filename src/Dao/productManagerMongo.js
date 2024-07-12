@@ -56,7 +56,7 @@ export default class ProductManager {
             await productsModel.create(product);
             return await productsModel.findOne({ title: product.title }).lean();
         } catch (err) {
-            return err
+            return err;
         }
     }
 

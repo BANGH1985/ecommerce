@@ -1,45 +1,87 @@
-import ProductManager from '../Dao/productManagerMongo.js';
+import ProductService from '../services/productService.js';
 
-const productManager = new ProductManager();
+const productService = new ProductService();
 
 export default class ProductController {
-    async getProducts(filter, options) {
+    async getProducts(req, res) {
         try {
-            return await productManager.getProducts(filter, options);
+            let { limit = 10, page = 1, sort, query, availability } = req.query;
+            const options = {
+                page: Number(page),
+                limit: Number(limit),
+                lean: true
+            };
+
+            if (sort) {
+                options.sort = { price: sort === 'asc' ? 1 : -1 };
+            }
+
+            let filter = {};
+            if (query) {
+                filter.category = query;
+            }
+            if (availability) {
+                filter.status = availability === 'available' ? true : false;
+            }
+
+            const products = await productService.getProducts(filter, options);
+
+            res.status(200).json({
+                status: 'success',
+                payload: products.docs,
+                totalPages: products.totalPages,
+                prevPage: products.hasPrevPage ? products.prevPage : null,
+                nextPage: products.hasNextPage ? products.nextPage : null,
+                page: products.page,
+                hasPrevPage: products.hasPrevPage,
+                hasNextPage: products.hasNextPage
+            });
         } catch (error) {
-            throw error;
+            res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
         }
     }
 
-    async getProductById(id) {
+    async getProductById(req, res) {
         try {
-            return await productManager.getProductById(id);
+            const { productId } = req.params;
+            const product = await productService.getProductById(productId);
+            if (!product) {
+                return res.status(404).json({ status: 'error', message: 'Product not found' });
+            }
+            res.status(200).json({ status: 'success', payload: product });
         } catch (error) {
-            throw error;
+            res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
         }
     }
 
-    async addProduct(product) {
+    async addProduct(req, res) {
         try {
-            return await productManager.addProduct(product);
+            const product = req.body;
+            const newProduct = await productService.addProduct(product);
+            res.status(201).json({ status: 'success', payload: newProduct });
         } catch (error) {
-            throw error;
+            res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
         }
     }
 
-    async updateProduct(id, product) {
+    async updateProduct(req, res) {
         try {
-            return await productManager.updateProduct(id, product);
+            const { productId } = req.params;
+            const product = req.body;
+            const updatedProduct = await productService.updateProduct(productId, product);
+            res.status(200).json({ status: 'success', payload: updatedProduct });
         } catch (error) {
-            throw error;
+            res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
         }
     }
 
-    async deleteProduct(id) {
+    async deleteProduct(req, res) {
         try {
-            return await productManager.deleteProduct(id);
+            const { productId } = req.params;
+            await productService.deleteProduct(productId);
+            res.status(204).json({ status: 'success' });
         } catch (error) {
-            throw error;
+            res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
         }
     }
 }
