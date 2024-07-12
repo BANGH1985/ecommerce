@@ -1,6 +1,7 @@
 import passport from 'passport';
 import User from '../models/user.js';
 import Cart from '../models/carts.model.js';
+import { createHash } from '../utils.js';
 
 export const registerUser = async (req, res) => {
     const { first_name, last_name, email, password } = req.body;  
@@ -10,7 +11,7 @@ export const registerUser = async (req, res) => {
             return res.redirect('/register?error=El email ya está en uso.');
         }
 
-        const newUser = new User({ first_name, last_name, email, password });  
+        const newUser = new User({ first_name, last_name, email, password: createHash(password) });  
         await newUser.save();
 
         const newCart = new Cart();
@@ -63,10 +64,12 @@ export const logoutUser = (req, res) => {
 };
 
 export const getCurrentSession = (req, res) => {
+    console.log(req.session.user);
     if (req.session.user) {
-        res.json({ user: req.session.user })
+        res.render("current", { user: req.session.user });
+      // res.json({ user: req.session.user });
     } else {
-        res.status(401).json({ error: 'Usuario no autenticado' });
+        res.status(401).json({ error: "Usuario no autenticado" });
     }
 };
 

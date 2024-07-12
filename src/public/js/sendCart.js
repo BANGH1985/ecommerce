@@ -92,7 +92,9 @@ function renderProducts(products) {
 
     document.querySelectorAll('.product').forEach(button => {
         button.addEventListener('click', () => {
-            const cartId = "669076eae95c0ff7cd6d8856"
+            //const cartId = "669076eae95c0ff7cd6d8856"
+            const cartElement = document.querySelector("#cartid");
+            const cartId = cartElement.getAttribute("data-value");
             if (cartId) {
                 addToCart(cartId, button.id, 1); // Pasar los parámetros correctos a `addToCart`
             } else {
