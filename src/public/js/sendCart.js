@@ -92,7 +92,7 @@ function renderProducts(products) {
 
     document.querySelectorAll('.product').forEach(button => {
         button.addEventListener('click', () => {
-
+            const cartId = "669076eae95c0ff7cd6d8856"
             if (cartId) {
                 addToCart(cartId, button.id, 1); // Pasar los parámetros correctos a `addToCart`
             } else {
@@ -120,7 +120,7 @@ async function addToCart(cartId, productId, quantity) {
         }
 
         const data = await response.json();
-        //console.log("Response data:", data);
+        console.log("Response data:", data);
 
         Swal.fire('Producto añadido', 'El producto ha sido añadido al carrito', 'success');
     } catch (error) {

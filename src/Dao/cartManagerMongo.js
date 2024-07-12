@@ -47,8 +47,8 @@ export default class CartManager {
             await cart.save();
             return cart;
         } catch (error) {
-            console.error('Error al agregar el producto al carrito:', error);
-            throw error;
+            //console.error('Error al agregar el producto al carrito:', error);
+            //throw error;
         }
     }
 

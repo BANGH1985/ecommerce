@@ -15,7 +15,7 @@ export default class CartController {
 
     async getCartById(req, res) {
         try {
-            const cartId = req.user.cart;
+            const cartId = req.user.cart._id;
             const cart = await cartManager.getCartById(cartId);
             //console.log(cart);
             if (cart) {
