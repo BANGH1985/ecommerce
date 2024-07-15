@@ -52,9 +52,10 @@ const hbs = handlebars.create({
         allowProtoMethodsByDefault: true,
     }
 });
+
+// Configuración de Express para renderizar vistas con handlebars
 app.engine('handlebars', hbs.engine);
 app.set('view engine', 'handlebars');
-
 app.set('views', __dirname + '/views');
 
 // Rutas

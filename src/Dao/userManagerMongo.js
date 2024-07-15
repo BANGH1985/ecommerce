@@ -1,4 +1,4 @@
-import User from '../models/user.js';
+import User from '../models/user.model.js';
 import Cart from '../models/carts.model.js';
 
 export default class UserManager {

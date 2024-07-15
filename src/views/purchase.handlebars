@@ -1,0 +1,14 @@
+<!-- purchase.handlebars -->
+<body>
+    <div class="container mt-5">
+        <h3 class="text-center">Compra realizada con éxito</h3>
+        <p>Gracias por tu compra. Aquí está el detalle de tu ticket:</p>
+        <ul>
+            <li><strong>Código de Ticket:</strong> {{ticket.code}}</li>
+            <li><strong>Fecha y Hora:</strong> {{ticket.purchase_datetime}}</li>
+            <li><strong>Total:</strong> ${{ticket.amount}}</li>
+            <li><strong>Correo del Comprador:</strong> {{ticket.purchaser}}</li>
+        </ul>
+        <a class="btn btn-info" href="/">Volver al inicio</a>
+    </div>
+</body>

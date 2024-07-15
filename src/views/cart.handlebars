@@ -47,6 +47,9 @@
                 <div class="col text-end">
                     <button class="btn btn-danger" onclick="emptyCart('{{cart._id}}')">Vaciar carrito</button>
                 </div>
+                <div class="col text-end">
+                    <a class="btn btn-success" href="/api/carts/{{cart._id}}/purchase">Finalizar la Compra</a>
+                </div>
             </div>
         {{else}}
             <div class="col text-end">

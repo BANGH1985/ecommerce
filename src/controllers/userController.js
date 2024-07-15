@@ -35,7 +35,8 @@ export const loginUser = async (req, res, next) => {
             if (err) {
                 return next(err);
             }
-            return res.redirect('/profile');
+            req.session.user = user;
+            return res.redirect('/api/sessions/current');
         });
     })(req, res, next);
 };

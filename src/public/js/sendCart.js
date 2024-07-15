@@ -1,5 +1,3 @@
-let cartId
-
 document.addEventListener('DOMContentLoaded', async () => {
     try {
         // Verificar si el usuario está en sesión y tiene un carrito asignado
@@ -15,7 +13,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await response.json();
             if (data.user && data.user.cart) {
                 cartId = data.user.cart; 
-                //console.log(cartId);
             } else {
                 console.error('Carrito no encontrado en la sesión del usuario');
             }
@@ -93,23 +90,40 @@ function renderProducts(products) {
 
     document.querySelectorAll('.product').forEach(button => {
         button.addEventListener('click', () => {
-            //const cartId = "669076eae95c0ff7cd6d8856"
-            const cartElement = document.querySelector("#cartid");
-            const cartId = cartElement.getAttribute("data-value");
-            if (cartId) {
-                addToCart(cartId, button.id, 1); // Pasar los parámetros correctos a `addToCart`
-            } else {
-                Swal.fire('Error', 'Carrito no encontrado', 'error');
-            }
+            Swal.fire({
+                title: 'Cantidad a agregar',
+                input: 'number',
+                inputAttributes: {
+                    min: 1,
+                    step: 1
+                },
+                showCancelButton: true,
+                confirmButtonText: 'Agregar',
+                cancelButtonText: 'Cancelar',
+                showLoaderOnConfirm: true,
+                preConfirm: (quantity) => {
+                    if (quantity <= 0) {
+                        Swal.showValidationMessage('La cantidad debe ser mayor que cero');
+                    }
+                    return quantity;
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const cartElement = document.querySelector("#cartid");
+                    const cartId = cartElement.getAttribute("data-value");
+                    if (cartId) {
+                        addToCart(cartId, button.id, parseInt(result.value, 10)); // Pasar la cantidad ingresada
+                    } else {
+                        Swal.fire('Error', 'Carrito no encontrado', 'error');
+                    }
+                }
+            });
         });
     });
 }
 
 async function addToCart(cartId, productId, quantity) {
     try {
-        //console.log("Cart ID:", cartId); // Agregar estos logs para verificar los valores
-        //console.log("Product ID:", productId);
-
         const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
             method: 'POST',
             headers: {
@@ -123,8 +137,6 @@ async function addToCart(cartId, productId, quantity) {
         }
 
         const data = await response.json();
-        //console.log("Response data:", data);
-
         Swal.fire('Producto añadido', 'El producto ha sido añadido al carrito', 'success');
     } catch (error) {
         console.error('Error al añadir el producto al carrito:', error);

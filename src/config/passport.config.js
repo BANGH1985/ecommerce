@@ -1,9 +1,9 @@
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { createHash, isValidPassword } from '../utils.js'
-import userService from '../models/user.js'
+import userService from '../models/user.model.js'
 import cartService from '../models/carts.model.js'
-import User from '../models/user.js';
+import User from '../models/user.model.js';
 import GitHubStrategy from 'passport-github2'
 
 

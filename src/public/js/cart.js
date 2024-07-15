@@ -1,3 +1,4 @@
+// Función para eliminar un producto del carrito
 async function removeFromCart(cartId, productId) {
     try {
         const response = await fetch(`/api/carts/${cartId}/products/${productId}`, {
@@ -13,7 +14,7 @@ async function removeFromCart(cartId, productId) {
                 text: 'El producto ha sido eliminado del carrito',
                 icon: 'success',
             }).then(() => {
-                location.reload(); 
+                location.reload(); // Recargar la página para reflejar los cambios
             });
         } else {
             Swal.fire({
@@ -32,6 +33,7 @@ async function removeFromCart(cartId, productId) {
     }
 }
 
+// Función para vaciar el carrito
 async function emptyCart(cartId) {
     try {
         const response = await fetch(`/api/carts/${cartId}`, {
@@ -47,7 +49,7 @@ async function emptyCart(cartId) {
                 text: 'Todos los productos han sido eliminados del carrito',
                 icon: 'success',
             }).then(() => {
-                location.reload(); 
+                location.reload(); // Recargar la página para reflejar los cambios
             });
         } else {
             Swal.fire({
