@@ -1,33 +1,82 @@
 <h1>Detalles de la Compra</h1>
-    <ul>
-        {{#each cart.items}}
-        <li>
-            Producto: {{this.productId.name}} - Cantidad: {{this.quantity}} - Precio: {{this.productId.price}}
-        </li>
-        {{/each}}
-    </ul>
-    <h3>Total: {{ticket.amount}}</h3>
-    <button id="payButton">Pagar</button>
+<ul>
+    {{#each cart.items}}
+    <li>
+        Producto: {{this.productId.title}} - Cantidad: {{this.quantity}} - Precio: ${{this.productId.price}}
+    </li>
+    {{/each}}
+</ul>
+<h3>Total: ${{ticket.amount}}</h3>
 
-    <script>
-        document.getElementById('payButton').addEventListener('click', async () => {
-            try {
-                const response = await fetch(`/api/carts/${cart._id}/purchase`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
+<button id="payButton">Pagar</button>
+<button id="sendReceiptButton">Enviar Comprobante</button>
+
+<script>
+    document.getElementById('payButton').addEventListener('click', async () => {
+        try {
+            const response = await fetch(`/api/carts/{{cart._id}}/purchase/pay`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Compra Exitosa',
+                    text: 'Compra realizada con éxito. Redirigiendo al home...',
+                    icon: 'success',
+                    timer: 3000,
+                    showConfirmButton: false
+                }).then(() => {
+                    window.location.href = '/';
                 });
-
-                if (response.ok) {
-                    alert('Compra realizada con éxito. Se ha enviado un correo con los detalles.');
-                    window.location.href = '/'; // Redirigir a la página principal
-                } else {
-                    alert('Error al realizar la compra.');
-                }
-            } catch (error) {
-                console.error('Error al realizar la compra:', error);
-                alert('Error al realizar la compra.');
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error al realizar la compra.',
+                    icon: 'error',
+                });
             }
-        });
-    </script>
+        } catch (error) {
+            console.error('Error al realizar la compra:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al realizar la compra.',
+                icon: 'error',
+            });
+        }
+    });
+
+    document.getElementById('sendReceiptButton').addEventListener('click', async () => {
+        try {
+            const response = await fetch(`/api/carts/{{cart._id}}/purchase/receipt`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                Swal.fire({
+                    title: 'Comprobante Enviado',
+                    text: 'El comprobante se ha enviado por correo.',
+                    icon: 'success',
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Error al enviar el comprobante.',
+                    icon: 'error',
+                });
+            }
+        } catch (error) {
+            console.error('Error al enviar el comprobante:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'Error al enviar el comprobante.',
+                icon: 'error',
+            });
+        }
+    });
+</script>

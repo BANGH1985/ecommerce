@@ -36,41 +36,17 @@ export default class CartController {
             if (!cart) {
                 return res.status(404).send('Carrito no encontrado');
             }
-
+    
             const amount = cart.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
-            const ticket = new Ticket({
+            const ticket = {
                 amount,
                 purchaser: req.user.email
-            });
-
-            await ticket.save();
-
-            // Enviar email con el comprobante de compra
-            const transporter = nodemailer.createTransport({
-                service: 'gmail',
-                auth: {
-                    user: 'dantesoriano30@gmail.com',
-                    pass: 'hhgu inyr vrgq mokv'
-                }
-            });
-
-            const mailOptions = {
-                from: 'dantesoriano30@gmail.com',
-                to: req.user.email,
-                subject: 'Comprobante de compra',
-                text: `Gracias por tu compra. El código de tu ticket es: ${ticket.code}`
             };
-
-            await transporter.sendMail(mailOptions);
-
-            // Vacia el carrito después de la compra
-            cart.items = [];
-            await cart.save();
-
+    
             res.render('purchase', { cart, ticket });
         } catch (error) {
-            console.error('Error al finalizar la compra:', error);
-            res.status(500).send('Error al finalizar la compra');
+            console.error('Error al obtener los detalles de la compra:', error);
+            res.status(500).send('Error al obtener los detalles de la compra');
         }
     }
 
@@ -83,6 +59,66 @@ export default class CartController {
         } catch (error) {
             console.error('Error al agregar el artículo al carrito:', error);
             res.status(500).json({ error: 'Error al agregar el artículo al carrito' });
+        }
+    }
+
+    async payForCart(req, res) {
+        try {
+            const { cid } = req.params;
+            const cart = await cartService.getCartById(cid);
+            if (!cart) {
+                return res.status(404).send('Carrito no encontrado');
+            }
+    
+            // Vaciar el carrito
+            cart.items = [];
+            await cart.save();
+    
+            res.status(200).send('Compra realizada con éxito');
+        } catch (error) {
+            console.error('Error al realizar la compra:', error);
+            res.status(500).send('Error al realizar la compra');
+        }
+    }
+    
+    async sendReceipt(req, res) {
+        try {
+            const { cid } = req.params;
+            const cart = await cartService.getCartById(cid);
+            if (!cart) {
+                return res.status(404).send('Carrito no encontrado');
+            }
+    
+            const amount = cart.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
+            const ticket = new Ticket({
+                amount,
+                purchaser: req.user.email
+            });
+    
+            await ticket.save();
+    
+            // Enviar email con el comprobante de compra
+            const transporter = nodemailer.createTransport({
+                service: 'gmail',
+                auth: {
+                    user: 'dantesoriano30@gmail.com',
+                    pass: 'hhgu inyr vrgq mokv'
+                }
+            });
+    
+            const mailOptions = {
+                from: 'dantesoriano30@gmail.com',
+                to: req.user.email,
+                subject: 'Comprobante de compra',
+                text: `Gracias por tu compra. El código de tu ticket es: ${ticket.code}`
+            };
+    
+            await transporter.sendMail(mailOptions);
+    
+            res.status(200).send('Comprobante enviado con éxito');
+        } catch (error) {
+            console.error('Error al enviar el comprobante:', error);
+            res.status(500).send('Error al enviar el comprobante');
         }
     }
 
