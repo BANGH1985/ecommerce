@@ -1,4 +1,6 @@
 import CartService from '../services/cartService.js';
+import nodemailer from 'nodemailer';
+import Ticket from '../models/ticket.model.js'; 
 
 const cartService = new CartService();
 
@@ -28,14 +30,14 @@ export default class CartController {
     }
 
     async purchaseCart(req, res) {
-        const { cid } = req.params;
         try {
+            const { cid } = req.params;
             const cart = await cartService.getCartById(cid);
             if (!cart) {
                 return res.status(404).send('Carrito no encontrado');
             }
 
-            const amount = cart.products.reduce((total, product) => total + (product.price * product.quantity), 0);
+            const amount = cart.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
             const ticket = new Ticket({
                 amount,
                 purchaser: req.user.email
@@ -61,7 +63,11 @@ export default class CartController {
 
             await transporter.sendMail(mailOptions);
 
-            res.status(200).send('Compra finalizada y comprobante enviado por email');
+            // Vacia el carrito después de la compra
+            cart.items = [];
+            await cart.save();
+
+            res.render('purchase', { cart, ticket });
         } catch (error) {
             console.error('Error al finalizar la compra:', error);
             res.status(500).send('Error al finalizar la compra');
@@ -99,17 +105,6 @@ export default class CartController {
         } catch (error) {
             console.error('Error al vaciar el carrito:', error);
             res.status(500).json({ error: 'Error al vaciar el carrito' });
-        }
-    }
-
-    async purchaseCart(req, res) {
-        try {
-            const { cartId } = req.params;
-            const purchaseResult = await cartService.purchaseCart(cartId);
-            res.render('purchase', { ticket: purchaseResult.ticket });
-        } catch (error) {
-            console.error('Error al realizar la compra del carrito:', error);
-            res.status(500).json({ error: 'Error al realizar la compra del carrito' });
         }
     }
 }

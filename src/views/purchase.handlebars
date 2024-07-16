@@ -1,14 +1,33 @@
-<!-- purchase.handlebars -->
-<body>
-    <div class="container mt-5">
-        <h3 class="text-center">Compra realizada con éxito</h3>
-        <p>Gracias por tu compra. Aquí está el detalle de tu ticket:</p>
-        <ul>
-            <li><strong>Código de Ticket:</strong> {{ticket.code}}</li>
-            <li><strong>Fecha y Hora:</strong> {{ticket.purchase_datetime}}</li>
-            <li><strong>Total:</strong> ${{ticket.amount}}</li>
-            <li><strong>Correo del Comprador:</strong> {{ticket.purchaser}}</li>
-        </ul>
-        <a class="btn btn-info" href="/">Volver al inicio</a>
-    </div>
-</body>
+<h1>Detalles de la Compra</h1>
+    <ul>
+        {{#each cart.items}}
+        <li>
+            Producto: {{this.productId.name}} - Cantidad: {{this.quantity}} - Precio: {{this.productId.price}}
+        </li>
+        {{/each}}
+    </ul>
+    <h3>Total: {{ticket.amount}}</h3>
+    <button id="payButton">Pagar</button>
+
+    <script>
+        document.getElementById('payButton').addEventListener('click', async () => {
+            try {
+                const response = await fetch(`/api/carts/${cart._id}/purchase`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (response.ok) {
+                    alert('Compra realizada con éxito. Se ha enviado un correo con los detalles.');
+                    window.location.href = '/'; // Redirigir a la página principal
+                } else {
+                    alert('Error al realizar la compra.');
+                }
+            } catch (error) {
+                console.error('Error al realizar la compra:', error);
+                alert('Error al realizar la compra.');
+            }
+        });
+    </script>

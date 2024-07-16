@@ -13,4 +13,5 @@ router.get('/chat', isAuthenticated, isUser, viewsController.getChat.bind(viewsC
 router.get('/login', isNotAuthenticated, viewsController.getLogin.bind(viewsController));
 router.get('/register', isNotAuthenticated, viewsController.getRegister.bind(viewsController));
 
+
 export default router;

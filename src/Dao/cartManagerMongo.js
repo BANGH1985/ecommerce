@@ -15,7 +15,7 @@ export default class CartManager {
 
     async getCartById(cartId) {
         try {
-            const cart = await Cart.findById(cartId).populate("items.productId").lean();
+            const cart = await Cart.findById(cartId).populate("items.productId")
             return cart;
         } catch (error) {
             console.error('Error al obtener el carrito por ID:', error.message);
@@ -54,7 +54,7 @@ export default class CartManager {
 
     async removeItemFromCart(cartId, productId) {
         try {
-            const cart = await Cart.findById(cartId);
+            const cart = await Cart.findById(cartId)
             if (!cart) throw new Error('Carrito no encontrado');
 
             cart.items = cart.items.filter(item => item.productId.toString() !== productId);
@@ -82,9 +82,9 @@ export default class CartManager {
 
     async purchaseCart(cartId) {
         try {
-            const cart = await Cart.findById(cartId);
+            const { cid } = req.params;
+            const cart = await Cart.findById(cartId)
             if (!cart) throw new Error('Carrito no encontrado');
-
             // Lógica para procesar la compra
             cart.items = [];
             await cart.save();
@@ -95,3 +95,5 @@ export default class CartManager {
         }
     }
 }
+
+

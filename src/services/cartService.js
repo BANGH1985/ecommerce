@@ -26,4 +26,10 @@ export default class CartService {
     async purchaseCart(cartId) {
         return await cartManager.purchaseCart(cartId);
     }
+
+    async getPurchaseDetails(cartId) {
+        return await cartManager.getPurchaseDetails(cartId);
+    }
 }
+
+

@@ -10,6 +10,6 @@ router.get('/:cid', isAuthenticated, isUser, cartController.getCartById);
 router.post('/:cid/products/:pid', isAuthenticated, isUser, cartController.addItemToCart);
 router.delete('/:cid/products/:pid', isAuthenticated, isUser, cartController.removeItemFromCart); 
 router.delete('/:cid', isAuthenticated, isUser, cartController.clearCart);
-router.post('/:cid/purchase', isAuthenticated, isUser, cartController.purchaseCart);
+router.get('/:cid/purchase', isAuthenticated, isUser, cartController.purchaseCart);
 
 export default router;
