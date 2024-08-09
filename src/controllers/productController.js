@@ -57,10 +57,16 @@ export default class ProductController {
     async addProduct(req, res) {
         try {
             const product = req.body;
+            const user = req.session.user;
+
+            if (user.role === 'premium') {
+                product.owner = user.email; // Asignamos el owner al email del usuario premium
+            }
+
             const newProduct = await productService.addProduct(product);
             res.status(201).json({ status: 'success', payload: newProduct });
         } catch (error) {
-            res.status(500).json({ status: 'error', message: 'Internal Server Error', error: error.message });
+            res.status(500).json({ status: 'error', message: 'Error interno del servidor', error: error.message });
         }
     }
 

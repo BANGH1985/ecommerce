@@ -53,10 +53,11 @@ export default class ProductManager {
 
     async addProduct(product) {
         try {
-            await productsModel.create(product);
-            return await productsModel.findOne({ title: product.title }).lean();
+            const newProduct = await productsModel.create(product);
+            return newProduct.toObject(); // Convertir a objeto plano
         } catch (err) {
-            return err;
+            console.error('Error al crear producto:', err.message);
+            throw err;
         }
     }
 

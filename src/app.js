@@ -12,6 +12,7 @@ import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import viewsRoutes from './routes/viewsRoutes.js';
 import userRoutes from './routes/userRoutes.js';
+import sessionRoutes from './routes/sessionRoutes.js';
 
 import initializePassport from './config/passport.config.js';
 import connectToDB from './config/configServer.js';
@@ -63,6 +64,7 @@ app.use('/api', productRoutes);
 app.use('/api/carts', cartRoutes);
 app.use('/', viewsRoutes);
 app.use('/api/sessions', userRoutes);
+app.use('/api/sessions', sessionRoutes);
 
 initializePassport();
 const httpServer = app.listen(PORT, () => {

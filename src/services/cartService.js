@@ -1,5 +1,7 @@
 import CartManager from '../Dao/cartManagerMongo.js';
+import ProductManager from '../Dao/productManagerMongo.js';
 
+const productManager = new ProductManager();
 const cartManager = new CartManager();
 
 export default class CartService {
@@ -7,6 +9,9 @@ export default class CartService {
         return await cartManager.createCart();
     }
 
+    async getProductById(productId) {
+        return await productManager.getProductById(productId);
+    }
     async getCartById(cartId) {
         return await cartManager.getCartById(cartId);
     }
