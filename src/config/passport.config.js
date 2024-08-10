@@ -68,7 +68,6 @@ const initializePassport = () => {
             if (!isMatch) {
                 return done(null, false, { message: 'Contraseña incorrecta' });
             }
-
             return done(null, user);
         } catch (error) {
             return done(error);

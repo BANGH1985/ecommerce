@@ -54,13 +54,15 @@ export default class CartController {
         try {
             const { cid, pid } = req.params;
             const { quantity } = req.body;
-            const updatedCart = await cartService.addItemToCart(cid, pid, quantity);
+            const user = req.session.user;  // Asegúrate de obtener el usuario de la sesión
+            const updatedCart = await cartService.addItemToCart(cid, pid, quantity, user);  // Pasar el usuario al servicio
             res.status(200).json(updatedCart);
         } catch (error) {
-            console.error('Error al agregar el artículo al carrito:', error);
+            console.error('Error al agregar el artículo al carrito:', error.message);
             res.status(500).json({ error: 'Error al agregar el artículo al carrito' });
         }
     }
+    
 
     async payForCart(req, res) {
         try {

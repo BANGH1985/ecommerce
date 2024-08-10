@@ -16,7 +16,11 @@ export default class CartService {
         return await cartManager.getCartById(cartId);
     }
 
-    async addItemToCart(cartId, productId, quantity) {
+    async addItemToCart(cartId, productId, quantity, user) {
+        const product = await productManager.getProductById(productId);
+        if (product.owner === user.email) {
+            throw new Error('No puedes agregar tus propios productos al carrito');
+        }
         return await cartManager.addItemToCart(cartId, productId, quantity);
     }
 

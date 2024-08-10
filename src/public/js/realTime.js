@@ -29,7 +29,8 @@ function updateProductList(productList) {
                 </p>
             </div>
             <div class="d-flex justify-content-center mb-4">
-            <button type="button" class="btn btn-danger delete-btn" onclick="deleteProduct(${product._id})">Eliminar</button>
+            <button type="button" class="btn btn-danger delete-btn" onclick="deleteProduct('${product._id}')">Eliminar</button>
+
             </div>
           </div>
         </div>`
@@ -39,33 +40,38 @@ function updateProductList(productList) {
   }
 
 
-  let form = document.getElementById("formProduct")
-  form.addEventListener("submit", (evt) => {
-    evt.preventDefault()
-  
-    let title = form.elements.title.value
-    let description = form.elements.description.value
-    let stock = form.elements.stock.value
-    let thumbnail = form.elements.thumbnail.value
-    let category = form.elements.category.value
-    let price = form.elements.price.value
-    let code = form.elements.code.value
-    let status = form.elements.status.checked
-  
-    socketClient.emit("addProduct", {
-        title,
-        description,
-        stock,
-        thumbnail,
-        category,
-        price,
-        code,
-      status, 
-  
-    })
-  
-    form.reset()
-  })
+  let form = document.getElementById("formProduct");
+    form.addEventListener("submit", (evt) => {
+        evt.preventDefault();
+        
+        const title = form.elements.title.value;
+        const description = form.elements.description.value;
+        const stock = form.elements.stock.value;
+        const thumbnail = form.elements.thumbnail.value;
+        const category = form.elements.category.value;
+        const price = form.elements.price.value;
+        const code = form.elements.code.value;
+        const status = form.elements.status.checked;
+
+        // Crear un objeto con la información del producto
+        const product = {
+            title,
+            description,
+            stock,
+            thumbnail,
+            category,
+            price,
+            code,
+            status,
+        };
+
+        console.log("Producto a enviar:", product); // Log para verificar que el producto se está creando correctamente
+
+        // Emitir el evento addProduct al servidor
+        socketClient.emit("addProduct", { user, product });
+
+        form.reset(); // Reiniciar el formulario después de enviar
+    });
 
   document.getElementById("delete-btn").addEventListener("click", function () {
     const deleteidinput = document.getElementById("id-prod");
@@ -75,5 +81,5 @@ function updateProductList(productList) {
 });
 
 function deleteProduct(_id) {
-    socketClient.emit("deleteProduct", _id);
+  socketClient.emit("deleteProduct", { user, id: _id });
 }

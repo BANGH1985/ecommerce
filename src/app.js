@@ -48,6 +48,11 @@ app.use((req, res, next) => {
 
 // Configuración de handlebars
 const hbs = handlebars.create({
+    helpers: {
+        json: function(context) {
+            return JSON.stringify(context);
+        }
+    },
     runtimeOptions: {
         allowProtoPropertiesByDefault: true,
         allowProtoMethodsByDefault: true,

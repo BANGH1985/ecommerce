@@ -1,4 +1,9 @@
+import ProductService from '../services/productService.js';
+
+const productService = new ProductService();
+
 export const isAuthenticated = (req, res, next) => {
+    console.log('isAuthenticated Middleware:', req.session.user);
     if (req.session.user) {
         return next();
     } else {
@@ -36,7 +41,6 @@ export const isOwnerOrAdmin = (req, res, next) => {
     if (user.role === 'admin') {
         return next();
     }
-
     // Asegúrate de tener acceso al servicio o gestor de productos en este archivo o pásalo desde el controller
     productService.getProductById(productId).then((product) => {
         if (product.owner === user.email || user.role === 'admin') {
@@ -49,10 +53,40 @@ export const isOwnerOrAdmin = (req, res, next) => {
         res.status(500).send('Error interno del servidor');
     });
 };
+// Middleware que permite acceso solo a admin o premium
+export const isAdminOrPremium = (req, res, next) => {
+    if (req.session.user && (req.session.user.role === 'admin' || req.session.user.role === 'premium')) {
+        return next();
+    } else {
+        res.status(403).send('Acceso denegado. Solo administradores y usuarios premium pueden realizar esta acción.');
+    }
+};
+
+// Middleware que permite acceso solo a user o premium
+export const isUserOrPremium = (req, res, next) => {
+    if (req.session.user && (req.session.user.role === 'user' || req.session.user.role === 'premium')) {
+        return next();
+    } else {
+        res.status(403).send('Acceso denegado. Solo usuarios y usuarios premium pueden realizar esta acción.');
+    }
+};
+
 export const isUser = (req, res, next) => {
     if (req.session.user && req.session.user.role === 'user') {
         return next();
     } else {
         res.status(403).send('Acceso denegado. Solo los usuarios pueden realizar esta acción.');
     }
+};
+
+export const isNotOwner = async (req, res, next) => {
+    const user = req.session.user;
+    const productId = req.params.pid;
+    const product = await productService.getProductById(productId);
+
+    if (product.owner === user.email) {
+        return res.status(403).json({ error: 'No puedes agregar tus propios productos al carrito' });
+    }
+
+    next();
 };

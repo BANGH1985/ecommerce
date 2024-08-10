@@ -51,9 +51,15 @@ export default class ProductManager {
         }
     };
 
-    async addProduct(product) {
+    async addProduct(product, user) {
         try {
-            const newProduct = await productsModel.create(product);
+            // Asignar el campo 'owner' basado en el rol del usuario
+            const owner = user.role === 'premium' ? user.email : 'admin';
+    
+            const newProduct = await productsModel.create({
+                ...product,
+                owner,  // Asignamos el dueño del producto
+            });
             return newProduct.toObject(); // Convertir a objeto plano
         } catch (err) {
             console.error('Error al crear producto:', err.message);

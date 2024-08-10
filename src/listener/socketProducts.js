@@ -6,17 +6,36 @@ const socketProducts = (socketServer) => {
         console.log("client connected con ID:",socket.id)
         const listadeproductos=await pm.getProductsView()
         socketServer.emit("enviodeproducts",listadeproductos)
-        socket.on("addProduct",async(obj)=>{
-        await pm.addProduct(obj)
-        const listadeproductos=await pm.getProductsView()
-        socketServer.emit("enviodeproducts",listadeproductos)
-        })
-        socket.on("deleteProduct",async(id)=>{
-            console.log(id)
-            await pm.deleteProduct(id)
-            const listadeproductos=await pm.getProductsView()
-            socketServer.emit("enviodeproducts",listadeproductos)
-            })
+        socket.on("addProduct", async (obj) => {
+            const { user, product } = obj;  // Desestructuramos para obtener user y product
+        
+            console.log("Usuario:", user);  // Agregamos un log para verificar si el usuario se está recibiendo
+            console.log("Producto:", product);  // Agregamos un log para verificar si el producto se está recibiendo
+        
+            if (user && product) {  // Verificamos que ambos estén definidos
+                await pm.addProduct(product, user);  // Pasamos ambos al método
+                const listadeproductos = await pm.getProductsView();
+                socketServer.emit("enviodeproducts", listadeproductos);
+            } else {
+                console.error("Faltan datos de usuario o producto");
+            }
+        });
+        socket.on("deleteProduct", async (data) => {
+            const { user, id } = data;  // Desestructuramos para obtener user y id
+        
+            const product = await pm.getProductById(id);
+            if (product) {
+                if (user.role === 'admin' || (user.role === 'premium' && product.owner === user.email)) {
+                    await pm.deleteProduct(id);
+                    const listadeproductos = await pm.getProductsView();
+                    socketServer.emit("enviodeproducts", listadeproductos);
+                } else {
+                    console.error("No tienes permiso para eliminar este producto.");
+                }
+            } else {
+                console.error("Producto no encontrado.");
+            }
+        });
         socket.on("nuevousuario",(usuario)=>{
             console.log("usuario" ,usuario)
             socket.broadcast.emit("broadcast",usuario)

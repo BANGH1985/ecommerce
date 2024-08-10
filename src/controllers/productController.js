@@ -56,11 +56,14 @@ export default class ProductController {
 
     async addProduct(req, res) {
         try {
+            console.log('Usuario autenticado:', req.session.user);
             const product = req.body;
             const user = req.session.user;
 
             if (user.role === 'premium') {
                 product.owner = user.email; // Asignamos el owner al email del usuario premium
+            } else {
+                product.owner = 'admin';
             }
 
             const newProduct = await productService.addProduct(product);
