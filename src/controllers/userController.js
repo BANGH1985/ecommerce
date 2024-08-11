@@ -123,3 +123,52 @@ export const resetPassword = async (req, res) => {
     }
 };
 
+
+export const renderChangeRole = async (req, res) => {
+    try {
+        const user = await userService.findUserById(req.user._id);
+        if (!user) {
+            return res.status(404).send('Usuario no encontrado');
+        }
+        res.render('changeRole', { user });
+    } catch (error) {
+        console.error('Error al renderizar la vista de cambio de rol:', error);
+        res.status(500).send('Error al renderizar la vista');
+    }
+};
+
+export const changeRole = async (req, res) => {
+    try {
+        console.log('Entrando a changeRole');
+        const { uid } = req.params;
+        const { role } = req.body;
+        console.log('UID:', uid, 'Role:', role);
+
+        const user = await userService.findUserById(uid);
+        if (!user) {
+            console.log('Usuario no encontrado');
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        // Cambiar el rol del usuario
+        if (role === 'premium') {
+            user.role = 'premium';
+        } else if (role === 'user') {
+            user.role = 'user';
+        }
+
+        await userService.updateUserRole(user);
+        console.log('Rol cambiado exitosamente');
+
+        // Actualizar los datos de la sesión
+        if (req.session.user._id.toString() === uid.toString()) {
+            req.session.user.role = user.role;
+        }
+
+        return res.status(200).json({ message: 'Rol cambiado exitosamente' });
+    } catch (error) {
+        console.error('Error al cambiar el rol del usuario:', error);
+        return res.status(500).json({ error: 'Error al cambiar el rol' });
+    }
+};
+

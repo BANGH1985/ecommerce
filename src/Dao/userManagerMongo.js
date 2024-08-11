@@ -79,4 +79,22 @@ export default class UserManager {
         }
     }
 
+    async findUserById(userId) {
+        try {
+            return await User.findById(userId).lean(); // Utilizando lean() para convertir a objeto plano
+        } catch (error) {
+            console.error('Error al buscar usuario por ID:', error);
+            throw error;
+        }
+    }
+
+    async updateUserRole(user) {
+        try {
+            return await User.findByIdAndUpdate(user._id, { role: user.role }, { new: true });
+        } catch (error) {
+            console.error('Error al actualizar el rol del usuario:', error);
+            throw error;
+        }
+    }
+
 }

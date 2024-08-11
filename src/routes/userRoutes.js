@@ -1,7 +1,7 @@
 
 import express from 'express';
 import passport from 'passport';
-import { registerUser, loginUser, logoutUser, getCurrentSession, isAuthenticated, sendPasswordResetEmail, resetPassword } from '../controllers/userController.js';
+import { registerUser, loginUser, logoutUser, getCurrentSession, isAuthenticated, sendPasswordResetEmail, resetPassword, renderChangeRole, changeRole } from '../controllers/userController.js';
 
 const router = express.Router();
 
@@ -20,6 +20,9 @@ router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/logout', logoutUser);
 router.get('/current', isAuthenticated, getCurrentSession);
+
+router.get('/change-role', isAuthenticated, renderChangeRole);
+router.post('/change-role/:uid', isAuthenticated, changeRole);
 
 router.post('/forgot-password', sendPasswordResetEmail);
 router.post('/reset-password/:token', resetPassword);

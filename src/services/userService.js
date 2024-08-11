@@ -38,4 +38,12 @@ export default class UserService {
         const hashedPassword = createHash(newPassword);
         return await userManager.updatePassword(userId, hashedPassword);
     }
+
+    async findUserById(userId) {
+        return await userManager.findUserById(userId);
+    }
+
+    async updateUserRole(user) {
+        return await userManager.updateUserRole(user);
+    }
 }
