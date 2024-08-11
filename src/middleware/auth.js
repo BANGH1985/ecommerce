@@ -3,7 +3,6 @@ import ProductService from '../services/productService.js';
 const productService = new ProductService();
 
 export const isAuthenticated = (req, res, next) => {
-    console.log('isAuthenticated Middleware:', req.session.user);
     if (req.session.user) {
         return next();
     } else {

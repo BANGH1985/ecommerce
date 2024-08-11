@@ -7,13 +7,9 @@ const socketProducts = (socketServer) => {
         const listadeproductos=await pm.getProductsView()
         socketServer.emit("enviodeproducts",listadeproductos)
         socket.on("addProduct", async (obj) => {
-            const { user, product } = obj;  // Desestructuramos para obtener user y product
-        
-            console.log("Usuario:", user);  // Agregamos un log para verificar si el usuario se está recibiendo
-            console.log("Producto:", product);  // Agregamos un log para verificar si el producto se está recibiendo
-        
-            if (user && product) {  // Verificamos que ambos estén definidos
-                await pm.addProduct(product, user);  // Pasamos ambos al método
+            const { user, product } = obj;
+            if (user && product) { 
+                await pm.addProduct(product, user); 
                 const listadeproductos = await pm.getProductsView();
                 socketServer.emit("enviodeproducts", listadeproductos);
             } else {
@@ -21,7 +17,7 @@ const socketProducts = (socketServer) => {
             }
         });
         socket.on("deleteProduct", async (data) => {
-            const { user, id } = data;  // Desestructuramos para obtener user y id
+            const { user, id } = data; 
         
             const product = await pm.getProductById(id);
             if (product) {

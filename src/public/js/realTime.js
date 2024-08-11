@@ -53,7 +53,6 @@ function updateProductList(productList) {
         const code = form.elements.code.value;
         const status = form.elements.status.checked;
 
-        // Crear un objeto con la información del producto
         const product = {
             title,
             description,
@@ -67,10 +66,9 @@ function updateProductList(productList) {
 
         console.log("Producto a enviar:", product); // Log para verificar que el producto se está creando correctamente
 
-        // Emitir el evento addProduct al servidor
         socketClient.emit("addProduct", { user, product });
 
-        form.reset(); // Reiniciar el formulario después de enviar
+        form.reset();
     });
 
   document.getElementById("delete-btn").addEventListener("click", function () {
