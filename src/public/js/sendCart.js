@@ -72,6 +72,7 @@ function renderProducts(products) {
                         <h5 class="card-title text-dark" id="title">${product.title}</h5>
                         <ul class="list-unstyled">
                             <li><i class="bi bi-currency-dollar"></i> Price: $${product.price}</li>
+                            <li><i class="bi bi-currency-house"></i> Category: ${product.category}</li>
                             <li><i class="bi bi-check-circle"></i> Status: ${product.status}</li>
                             <li>
                                 <img src="${product.thumbnail || 'default-image.jpg'}" alt="${product.title}" class="img-fluid mt-2">

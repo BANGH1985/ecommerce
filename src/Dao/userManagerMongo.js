@@ -42,4 +42,41 @@ export default class UserManager {
             throw error;
         }
     }
+    async savePasswordResetToken(userId, token, expires) {
+        try {
+            await User.findByIdAndUpdate(userId, {
+                resetPasswordToken: token,
+                resetPasswordExpires: expires,
+            });
+        } catch (error) {
+            console.error('Error al guardar el token de recuperación:', error);
+            throw error;
+        }
+    }
+
+    async findUserByResetToken(token) {
+        try {
+            return await User.findOne({
+                resetPasswordToken: token,
+                resetPasswordExpires: { $gt: Date.now() },
+            }).lean();
+        } catch (error) {
+            console.error('Error al buscar usuario por token de recuperación:', error);
+            throw error;
+        }
+    }
+
+    async updatePassword(userId, hashedPassword) {
+        try {
+            return await User.findByIdAndUpdate(userId, {
+                password: hashedPassword,
+                resetPasswordToken: null,
+                resetPasswordExpires: null,
+            });
+        } catch (error) {
+            console.error('Error al actualizar la contraseña:', error);
+            throw error;
+        }
+    }
+
 }

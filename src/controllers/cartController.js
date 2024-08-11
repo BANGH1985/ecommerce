@@ -1,6 +1,7 @@
 import CartService from '../services/cartService.js';
 import nodemailer from 'nodemailer';
 import Ticket from '../models/ticket.model.js'; 
+import dotenv from 'dotenv';
 
 const cartService = new CartService();
 
@@ -90,33 +91,33 @@ export default class CartController {
             if (!cart) {
                 return res.status(404).send('Carrito no encontrado');
             }
-    
+
             const amount = cart.items.reduce((total, item) => total + (item.productId.price * item.quantity), 0);
             const ticket = new Ticket({
                 amount,
                 purchaser: req.user.email
             });
-    
+
             await ticket.save();
-    
+
             // Enviar email con el comprobante de compra
             const transporter = nodemailer.createTransport({
                 service: 'gmail',
                 auth: {
-                    user: 'dantesoriano30@gmail.com',
-                    pass: 'hhgu inyr vrgq mokv'
+                    user: process.env.EMAIL_USER, // Usar la variable de entorno
+                    pass: process.env.EMAIL_PASS  // Usar la variable de entorno
                 }
             });
-    
+
             const mailOptions = {
-                from: 'dantesoriano30@gmail.com',
+                from: process.env.EMAIL_USER,
                 to: req.user.email,
                 subject: 'Comprobante de compra',
                 text: `Gracias por tu compra. El código de tu ticket es: ${ticket.code}`
             };
-    
+
             await transporter.sendMail(mailOptions);
-    
+
             res.status(200).send('Comprobante enviado con éxito');
         } catch (error) {
             console.error('Error al enviar el comprobante:', error);
