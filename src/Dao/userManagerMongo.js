@@ -96,5 +96,4 @@ export default class UserManager {
             throw error;
         }
     }
-
 }
