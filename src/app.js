@@ -7,6 +7,8 @@ import MongoStore from 'connect-mongo';
 import passport from 'passport';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import swaggerUi from 'swagger-ui-express';
+import YAML from 'yamljs';
 
 import productRoutes from './routes/productRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
@@ -24,6 +26,11 @@ connectToDB();
 
 const app = express();
 const PORT = 8080;
+
+// Cargar los archivos YAML
+const productDocumentation = YAML.load('./docs/products.yaml');
+const cartDocumentation = YAML.load('./docs/carts.yaml');
+const userDocumentation = YAML.load('./docs/users.yaml');
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'secretkey',
@@ -68,6 +75,11 @@ app.use('/', viewsRoutes);
 app.use('/api', productRoutes);
 app.use('/api/carts', cartRoutes);
 app.use('/api/sessions', userRoutes);
+
+// Configurar los endpoints de Swagger
+app.use('/api-docs/products', swaggerUi.serve, swaggerUi.setup(productDocumentation));
+app.use('/api-docs/carts', swaggerUi.serve, swaggerUi.setup(cartDocumentation));
+app.use('/api-docs/users', swaggerUi.serve, swaggerUi.setup(userDocumentation));
 
 initializePassport();
 const httpServer = app.listen(PORT, () => {

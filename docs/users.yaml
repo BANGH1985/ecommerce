@@ -1,0 +1,196 @@
+openapi: 3.0.0
+info:
+  title: Usuarios API
+  description: API para gestionar usuarios en la tienda.
+  version: 1.0.0
+paths:
+  /register:
+    post:
+      summary: Registrar un nuevo usuario
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '201':
+          description: Usuario registrado con éxito.
+        '400':
+          description: Error al registrar el usuario.
+  /login:
+    post:
+      summary: Iniciar sesión
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: Usuario autenticado con éxito.
+        '401':
+          description: Credenciales incorrectas.
+  /logout:
+    post:
+      summary: Cerrar sesión
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Sesión cerrada con éxito.
+  /current:
+    get:
+      summary: Obtener la sesión actual
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Sesión obtenida con éxito.
+        '401':
+          description: No hay usuario autenticado.
+  /change-role:
+    get:
+      summary: Renderizar la vista de cambio de rol
+      tags:
+        - Usuarios
+      responses:
+        '200':
+          description: Vista renderizada con éxito.
+        '500':
+          description: Error al renderizar la vista.
+  /change-role/{uid}:
+    post:
+      summary: Cambiar el rol del usuario
+      tags:
+        - Usuarios
+      parameters:
+        - name: uid
+          in: path
+          required: true
+          description: ID del usuario
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                role:
+                  type: string
+                  description: Nuevo rol del usuario
+      responses:
+        '200':
+          description: Rol cambiado con éxito.
+        '404':
+          description: Usuario no encontrado.
+  /forgot-password:
+    post:
+      summary: Enviar correo de recuperación de contraseña
+      tags:
+        - Usuarios
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Correo del usuario
+      responses:
+        '200':
+          description: Correo enviado con éxito.
+        '500':
+          description: Error al enviar el correo.
+  /reset-password/{token}:
+    post:
+      summary: Restablecer la contraseña
+      tags:
+        - Usuarios
+      parameters:
+        - name: token
+          in: path
+          required: true
+          description: Token de recuperación
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  description: Nueva contraseña
+      responses:
+        '200':
+          description: Contraseña restablecida con éxito.
+        '400':
+          description: Token inválido o expirado.
+  /github:
+    get:
+      summary: Iniciar sesión con GitHub
+      tags:
+        - Usuarios
+      responses:
+        '302':
+          description: Redirige a GitHub para autenticación.
+  /githubcallback:
+    get:
+      summary: Callback de autenticación de GitHub
+      tags:
+        - Usuarios
+      responses:
+        '302':
+          description: Redirige después de la autenticación.
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - email
+        - password
+      properties:
+        first_name:
+          type: string
+          description: Nombre del usuario
+        last_name:
+          type: string
+          description: Apellido del usuario
+        email:
+          type: string
+          description: Correo del usuario
+        password:
+          type: string
+          description: Contraseña del usuario
+        age:
+          type: number
+          description: Edad del usuario
+        role:
+          type: string
+          description: Rol del usuario
+    Login:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          description: Correo del usuario
+        password:
+          type: string
+          description: Contraseña del usuario

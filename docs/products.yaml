@@ -1,0 +1,125 @@
+openapi: 3.0.0
+info:
+  title: Productos API
+  description: API para gestionar productos en la tienda.
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      summary: Obtener todos los productos
+      tags:
+        - Productos
+      responses:
+        '200':
+          description: Lista de productos obtenida con éxito.
+        '500':
+          description: Error al obtener los productos.
+    post:
+      summary: Crear un nuevo producto
+      tags:
+        - Productos
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: Producto creado con éxito.
+        '400':
+          description: Error al crear el producto.
+  /products/{pid}:
+    get:
+      summary: Obtener un producto por ID
+      tags:
+        - Productos
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto obtenido con éxito.
+        '404':
+          description: Producto no encontrado.
+    put:
+      summary: Actualizar un producto
+      tags:
+        - Productos
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Producto actualizado con éxito.
+        '400':
+          description: Error al actualizar el producto.
+    delete:
+      summary: Eliminar un producto
+      tags:
+        - Productos
+      parameters:
+        - name: pid
+          in: path
+          required: true
+          description: ID del producto
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Producto eliminado con éxito.
+        '404':
+          description: Producto no encontrado.
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - title
+        - description
+        - price
+        - stock
+        - code
+        - category
+      properties:
+        title:
+          type: string
+          description: Nombre del producto
+        description:
+          type: string
+          description: Descripción del producto
+        price:
+          type: number
+          description: Precio del producto
+        stock:
+          type: number
+          description: Cantidad en stock
+        code:
+          type: string
+          description: Código único del producto
+        category:
+          type: string
+          description: Categoría del producto
+        thumbnail:
+          type: string
+          description: URL de la imagen del producto
+        status:
+          type: boolean
+          description: Estado del producto (activo o inactivo)
+        owner:
+          type: string
+          description: Propietario del producto (email)
