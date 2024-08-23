@@ -1,52 +1,76 @@
-// productRoutes.test.js
+import { expect } from 'chai';
+import request from 'supertest';
+import app from '../src/app.js'; // Asegúrate de que esta ruta sea la correcta a tu archivo principal de Express
 
-import * as chai from 'chai';
-import chaiHttp from 'chai-http';
-import { app } from '../src/app.js';  // Asegúrate de que la ruta sea correcta
-import ProductManager from '../src/Dao/productManagerMongo.js';
-import mongoose from 'mongoose';
-import supertest from 'supertest';
-
-const request = supertest(app);
-const expect = chai.expect;
-
-chai.use(chaiHttp);
 
 describe('Product Routes', () => {
-    let testProductId;
+  it('should get all products', (done) => {
+    request(app)
+      .get('/api/products')
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.be.an('array');
+        done();
+      });
+  });
 
-    before(async () => {
-        // Conectar a la base de datos de prueba
-        await mongoose.connect(process.env.MONGODB_URI_TEST);
-    });
-    it('should get all products', async () => {
-        const res = await request.get('/api/products');
-        expect(res.status).to.equal(200);
-        expect(res.body.status).to.equal('success');
-        expect(res.body.payload).to.be.an('array');
-    });
+  it('should add a new product', (done) => {
+    request(app)
+      .post('/api/products')
+      .send({
+        // Datos de prueba para crear un nuevo producto
+        name: 'Test Product',
+        price: 100,
+        description: 'This is a test product',
+      })
+      .expect(201)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('id'); // Ajusta esto según la estructura de tu respuesta
+        done();
+      });
+  });
 
-    it('should add a new product', async () => {
-        const newProduct = {
-            name: 'Test Product',
-            description: 'A test product description',
-            price: 20.99,
-            category: 'Test Category',
-            stock: 100
-        };
+  it('should get a product by ID', (done) => {
+    const productId = '66c8e627d57c3b15551a212a'; // Usa un ID de prueba válido
+    request(app)
+      .get(`/api/products/${productId}`)
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('product');
+        expect(res.body.product).to.have.property('id', productId);
+        done();
+      });
+  });
 
-        const res = await request.post('/api/products')
-            .send(newProduct);
+  it('should update a product', (done) => {
+    const productId = '66c8e627d57c3b15551a212a'; // Usa un ID de prueba válido
+    request(app)
+      .put(`/api/products/${productId}`)
+      .send({
+        // Datos de prueba para actualizar el producto
+        name: 'Updated Product',
+        price: 120,
+      })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('updated');
+        done();
+      });
+  });
 
-        expect(res.status).to.equal(201);
-        expect(res.body.status).to.equal('success');
-        expect(res.body.payload).to.have.property('_id');
-
-        testProductId = res.body.payload._id;
-    });
-
-    it('should delete a product by id', async () => {
-        const res = await request.delete(`/api/products/${testProductId}`);
-        expect(res.status).to.equal(204);
-    });
+  it('should delete a product', (done) => {
+    const productId = '66c8e627d57c3b15551a212a'; // Usa un ID de prueba válido
+    request(app)
+      .delete(`/api/products/${productId}`)
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('deleted');
+        done();
+      });
+  });
 });

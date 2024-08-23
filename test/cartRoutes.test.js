@@ -1,57 +1,50 @@
-// cartRoutes.test.js
-
-import * as chai from 'chai';
-import chaiHttp from 'chai-http';
-import { app } from '../src/app.js';  // Asegúrate de que la ruta sea correcta
-import mongoose from 'mongoose';
-import supertest from 'supertest';
-
-const request = supertest(app);
-const expect = chai.expect;
-
-chai.use(chaiHttp);
+import { expect } from 'chai';
+import request from 'supertest';
+import app from '../src/app.js'; // Asegúrate de que esta ruta sea la correcta a tu archivo principal de Express
 
 describe('Cart Routes', () => {
-    let testCartId;
-    let testProductId;
+  it('should create a new cart', (done) => {
+    request(app)
+      .post('/api/carts')
+      .send({
+        // Datos de prueba para crear un nuevo carrito
+        userId: '66c8e5b8d57c3b15551a2102',
+      })
+      .expect(201)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('cartId'); // Ajusta esto según la estructura de tu respuesta
+        done();
+      });
+  });
 
-    before(async () => {
-        // Conectar a la base de datos de prueba
-        await mongoose.connect(process.env.MONGODB_URI_TEST);
+  it('should get a cart by ID', (done) => {
+    const cartId = '66c8e5b8d57c3b15551a2104'; // Usa un ID de prueba válido
+    request(app)
+      .get(`/api/carts/${cartId}`)
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('cart');
+        expect(res.body.cart).to.have.property('id', cartId);
+        done();
+      });
+  });
 
-        // Crear un producto de prueba
-        const productRes = await request.post('/api/products').send({
-            name: 'Test Product',
-            description: 'A test product description',
-            price: 20.99,
-            category: 'Test Category',
-            stock: 100
-        });
-
-        testProductId = productRes.body.payload._id;
-    });
-
-    it('should create a new cart', async () => {
-        const res = await request.post('/api/carts');
-        expect(res.status).to.equal(201);
-        expect(res.body).to.have.property('_id');
-
-        testCartId = res.body._id;
-    });
-
-    it('should add a product to the cart', async () => {
-        const res = await request.post(`/api/carts/${testCartId}/product/${testProductId}`)
-            .send({ quantity: 2 });
-
-        expect(res.status).to.equal(200);
+  it('should add an item to the cart', (done) => {
+    const cartId = '66c8e5b8d57c3b15551a2104'; // Usa un ID de prueba válido
+    request(app)
+      .post(`/api/carts/${cartId}/items`)
+      .send({
+        productId: 'test-product-id',
+        quantity: 2,
+      })
+      .expect(200)
+      .end((err, res) => {
+        if (err) return done(err);
+        expect(res.body).to.have.property('items');
         expect(res.body.items).to.be.an('array');
-        expect(res.body.items[0]).to.have.property('productId');
-        expect(res.body.items[0].productId).to.equal(testProductId);
-    });
-
-    it('should remove a product from the cart', async () => {
-        const res = await request.delete(`/api/carts/${testCartId}/product/${testProductId}`);
-        expect(res.status).to.equal(200);
-        expect(res.body.items).to.be.an('array').that.is.empty;
-    });
+        done();
+      });
+  });
 });
