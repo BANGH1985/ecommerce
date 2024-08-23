@@ -24,7 +24,7 @@ import socketChat from './listener/socketChat.js';
 dotenv.config();
 connectToDB();
 
-const app = express();
+export const app = express();
 const PORT = 8080;
 
 // Cargar los archivos YAML
