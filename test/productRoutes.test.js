@@ -1,76 +1,51 @@
-import { expect } from 'chai';
-import request from 'supertest';
-import app from '../src/app.js'; // Asegúrate de que esta ruta sea la correcta a tu archivo principal de Express
+import chai from 'chai'
+import supertest from 'supertest'
 
+const expect = chai.expect
+const request = supertest('http://localhost:8080')
 
-describe('Product Routes', () => {
-  it('should get all products', (done) => {
-    request(app)
-      .get('/api/products')
-      .expect(200)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body).to.be.an('array');
-        done();
-      });
-  });
+describe('Testing Products Endpoints', function () {
+    this.timeout(5000)
+    
+    let productId = ''
 
-  it('should add a new product', (done) => {
-    request(app)
-      .post('/api/products')
-      .send({
-        // Datos de prueba para crear un nuevo producto
-        name: 'Test Product',
-        price: 100,
-        description: 'This is a test product',
-      })
-      .expect(201)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body).to.have.property('id'); // Ajusta esto según la estructura de tu respuesta
-        done();
-      });
-  });
+    this.beforeEach(async () => {
+        productId = '66c9122dbbc48eb46a8c3bf8'
+    })
 
-  it('should get a product by ID', (done) => {
-    const productId = '66c8e627d57c3b15551a212a'; // Usa un ID de prueba válido
-    request(app)
-      .get(`/api/products/${productId}`)
-      .expect(200)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body).to.have.property('product');
-        expect(res.body.product).to.have.property('id', productId);
-        done();
-      });
-  });
+    it('Debe obtener la lista de productos', async () => {
+        const response = await request.get('/api/products')
+        
+        expect(response.status).to.equal(200)
+        expect(response.body.status).to.equal('success')
+        expect(response.body.payload).to.be.an('array')
+        expect(response.body).to.have.property('totalPages')
+        expect(response.body).to.have.property('page')
+    })
 
-  it('should update a product', (done) => {
-    const productId = '66c8e627d57c3b15551a212a'; // Usa un ID de prueba válido
-    request(app)
-      .put(`/api/products/${productId}`)
-      .send({
-        // Datos de prueba para actualizar el producto
-        name: 'Updated Product',
-        price: 120,
-      })
-      .expect(200)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body).to.have.property('updated');
-        done();
-      });
-  });
+    it('Debe obtener la lista de los productos', async () => {
+        const response = await request.get('/api/products')
+        
+        expect(response.status).to.equal(200)
+        expect(response.body.status).to.equal('success')
+        expect(response.body.categories).to.be.an('array')
+    })
 
-  it('should delete a product', (done) => {
-    const productId = '66c8e627d57c3b15551a212a'; // Usa un ID de prueba válido
-    request(app)
-      .delete(`/api/products/${productId}`)
-      .expect(200)
-      .end((err, res) => {
-        if (err) return done(err);
-        expect(res.body).to.have.property('deleted');
-        done();
-      });
-  });
-});
+    it('Debe crear un mockProduct nuevo', async () => {
+        const productData = {
+            name: 'Test Product',
+            price: 100,
+            description: 'Test Description',
+            category: 'Test Category',
+            stock: 50,
+            thumbnail: 'test-image-url'
+        }
+
+        const response = await request.post('/realtimeproducts').send(productData)
+        
+        expect(response.status).to.equal(201)
+        expect(response.body.status).to.equal('success')
+        expect(response.body.message).to.equal('Producto creado correctamente')
+        expect(response.body.product).to.have.property('_id')
+    })
+})
