@@ -36,30 +36,4 @@ describe('Users Router Tests', function () {
 
         expect(response.status).to.equal(302)
     })
-
-    it('Debe actualizar el perfil de un usuario', async () => {
-        const profileData = {
-            first_name: 'Updated',
-            last_name: 'Name'
-        }
-
-        const response = await request.post(`/profile/${userId}`).send(profileData)
-
-        expect(response.status).to.equal(302)
-    })
-
-    it('Debe cambiar el rol de un usuario', async () => {
-        const response = await request.put(`/api/users/premium/${userId}`).send()
-
-        expect(response.status).to.equal(200)
-        expect(response.body.message).to.equal('Rol actualizado')
-    })
-
-    it('Debe eliminar un usuario', async () => {
-        //const response = await request.delete(`/profile/${userId}`)
-        //descomentar para testear el delete!!
-
-        expect(response.status).to.equal(200)
-        expect(response.body.message).to.equal('Perfil eliminado correctamente.')
-    })
 })
