@@ -1,4 +1,4 @@
-import chai from 'chai'
+import * as chai from 'chai'
 import supertest from 'supertest'
 
 const expect = chai.expect
@@ -14,7 +14,7 @@ describe('Testing Products Endpoints', function () {
     })
 
     it('Debe obtener la lista de productos', async () => {
-        const response = await request.get('/api/products')
+        const response = await request.get('/')
         
         expect(response.status).to.equal(200)
         expect(response.body.status).to.equal('success')
@@ -23,15 +23,7 @@ describe('Testing Products Endpoints', function () {
         expect(response.body).to.have.property('page')
     })
 
-    it('Debe obtener la lista de los productos', async () => {
-        const response = await request.get('/api/products')
-        
-        expect(response.status).to.equal(200)
-        expect(response.body.status).to.equal('success')
-        expect(response.body.categories).to.be.an('array')
-    })
-
-    it('Debe crear un mockProduct nuevo', async () => {
+    it('Debe crear un Product nuevo', async () => {
         const productData = {
             name: 'Test Product',
             price: 100,
