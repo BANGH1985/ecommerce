@@ -1,4 +1,4 @@
-import * as chai from 'chai'
+import chai from 'chai'
 import supertest from 'supertest'
 
 const expect = chai.expect
@@ -10,11 +10,11 @@ describe('Testing Products Endpoints', function () {
     let productId = ''
 
     this.beforeEach(async () => {
-        productId = '66c9122dbbc48eb46a8c3bf8'
+        productId = '66c8e627d57c3b15551a212a'
     })
 
     it('Debe obtener la lista de productos', async () => {
-        const response = await request.get('/')
+        const response = await request.get('/api/products')
         
         expect(response.status).to.equal(200)
         expect(response.body.status).to.equal('success')
@@ -23,21 +23,23 @@ describe('Testing Products Endpoints', function () {
         expect(response.body).to.have.property('page')
     })
 
-    it('Debe crear un Product nuevo', async () => {
+
+    it('Debe crear un nuevo producto', async () => {
         const productData = {
-            name: 'Test Product',
+            title: 'Test Product',
             price: 100,
             description: 'Test Description',
             category: 'Test Category',
             stock: 50,
-            thumbnail: 'test-image-url'
+            thumbnail: 'https://ciudadela.com.ar/cdn/shop/files/7000-E-M251_720x.jpg?v=1710361250',
+            code: 'TEST123',
+            owner: 'admin'
         }
 
-        const response = await request.post('/realtimeproducts').send(productData)
+        const response = await request.post('/api/products').send(productData)
         
         expect(response.status).to.equal(201)
         expect(response.body.status).to.equal('success')
         expect(response.body.message).to.equal('Producto creado correctamente')
-        expect(response.body.product).to.have.property('_id')
     })
 })

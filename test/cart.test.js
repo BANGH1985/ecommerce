@@ -1,4 +1,4 @@
-import * as chai from 'chai'
+import chai from 'chai'
 import supertest from 'supertest'
 
 const expect = chai.expect
@@ -7,23 +7,12 @@ const request = supertest('http://localhost:8080')
 describe('Carts Router Tests', function () {
     this.timeout(5000)
     
-    let cartId = '';
-    let productId = '';
-    let token = '';
+    let cartId = ''
+    let productId = ''
 
-    before(async () => {
-        // Simular un inicio de sesión para obtener un token
-        const loginResponse = await request.post('/api/sessions/login').send({
-            email: 'test@example.com',
-            password: 'password',
-        });
-        token = loginResponse.body.token;
-        console.log(loginResponse.body) 
-    });
-    
     beforeEach(async () => {
         cartId = '66c8e598d57c3b15551a20dd'
-        productId = '66c9122dbbc48eb46a8c3bf8'
+        productId = '66c8e627d57c3b15551a212a'
     })
 
     it('Debe obtener el carrito de un usuario', async () => {

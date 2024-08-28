@@ -41,7 +41,7 @@
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
-    "chai": "^5.1.1",
-    "mocha": "^10.7.3"
+    "chai": "^4.3.7",
+    "mocha": "^10.1.0"
   }
 }
