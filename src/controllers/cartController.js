@@ -18,7 +18,7 @@ export default class CartController {
 
     async getCartById(req, res) {
         try {
-            const cartId = req.user.cart._id;
+            const cartId = req.params.cid;
             const cart = await cartService.getCartById(cartId);
             if (!cart) {
                 return res.status(404).json({ error: 'Carrito no encontrado' });
