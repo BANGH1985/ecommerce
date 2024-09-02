@@ -27,24 +27,37 @@ export const registerUser = async (req, res) => {
 };
 
 export const loginUser = async (req, res, next) => {
-    passport.authenticate('login', (err, user, info) => {
+    passport.authenticate('login', async (err, user, info) => {
         if (err) {
             return next(err);
         }
         if (!user) {
             return res.redirect('/login?error=Usuario o contraseña incorrectos');
         }
-        req.logIn(user, (err) => {
+        req.logIn(user, async (err) => {
             if (err) {
                 return next(err);
             }
+
+            // Actualizar last_connection en login
+            await userService.updateLastConnection(user._id);
+
             req.session.user = user;
             return res.redirect('/api/sessions/current');
         });
     })(req, res, next);
 };
 
-export const logoutUser = (req, res) => {
+export const logoutUser = async (req, res, next) => {
+    if (req.user) {
+        try {
+            // Actualizar last_connection en logout
+            await userService.updateLastConnection(req.user._id);
+        } catch (error) {
+            console.error('Error al actualizar la última conexión:', error);
+        }
+    }
+    
     req.logout((err) => {
         if (err) {
             return next(err);
@@ -52,6 +65,28 @@ export const logoutUser = (req, res) => {
         res.redirect('/login?success=Sesión cerrada correctamente.');
     });
 };
+
+export const uploadDocuments = async (req, res) => {
+    const { uid } = req.params;
+    try {
+        const user = await userService.findUserById(uid);
+        if (!user) {
+            return res.status(404).json({ error: 'Usuario no encontrado' });
+        }
+
+        const documents = req.files.map(file => ({
+            name: file.fieldname,
+            reference: `/uploads/${file.fieldname === 'profile' ? 'profiles' : 'documents'}/${file.filename}`
+        }));
+
+        await userService.addUserDocuments(uid, documents);
+        return res.json({ message: 'Documentos subidos correctamente' }); // Cambia a JSON para AJAX
+    } catch (error) {
+        console.error('Error al subir documentos:', error);
+        return res.status(500).json({ error: 'Error al subir documentos' });
+    }
+};
+
 
 export const getCurrentSession = (req, res) => {
     if (req.isAuthenticated()) {
@@ -130,7 +165,9 @@ export const renderChangeRole = async (req, res) => {
         if (!user) {
             return res.status(404).send('Usuario no encontrado');
         }
-        res.render('changeRole', { user });
+        
+        const isPremium = user.role === 'premium';
+        res.render('changeRole', { user, isPremium });
     } catch (error) {
         console.error('Error al renderizar la vista de cambio de rol:', error);
         res.status(500).send('Error al renderizar la vista');
@@ -139,36 +176,47 @@ export const renderChangeRole = async (req, res) => {
 
 export const changeRole = async (req, res) => {
     try {
-        console.log('Entrando a changeRole');
         const { uid } = req.params;
         const { role } = req.body;
-        console.log('UID:', uid, 'Role:', role);
 
         const user = await userService.findUserById(uid);
         if (!user) {
-            console.log('Usuario no encontrado');
             return res.status(404).json({ error: 'Usuario no encontrado' });
         }
 
-        // Cambiar el rol del usuario
         if (role === 'premium') {
+            // Verificar si el usuario tiene al menos 3 documentos cargados
+            const hasEnoughDocuments = user.documents && user.documents.length >= 3;
+
+            if (!hasEnoughDocuments) {
+                return res.status(400).json({ error: 'El usuario no ha terminado de cargar la documentación requerida.' });
+            }
+
             user.role = 'premium';
         } else if (role === 'user') {
             user.role = 'user';
         }
 
         await userService.updateUserRole(user);
-        console.log('Rol cambiado exitosamente');
 
-        // Actualizar los datos de la sesión
+        // Actualizar la sesión del usuario si es el mismo usuario que está cambiando el rol
         if (req.session.user._id.toString() === uid.toString()) {
             req.session.user.role = user.role;
         }
 
-        return res.status(200).json({ message: 'Rol cambiado exitosamente' });
+        // Redireccionar al perfil actual después de cambiar el rol
+        return res.redirect('/api/sessions/current');
     } catch (error) {
         console.error('Error al cambiar el rol del usuario:', error);
         return res.status(500).json({ error: 'Error al cambiar el rol' });
     }
 };
+
+
+
+
+
+
+
+
 

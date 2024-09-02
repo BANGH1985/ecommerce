@@ -4,18 +4,18 @@
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="/realTimeProducts">Add Products</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link active" href="/chat">Chat</a>
                 </li>
             </ul>
         </div>
     </div>
     {{#if user}}
-            <div><a href="/api/sessions/current" class="btn btn-info">Profile</a></div>
-            <div><a href="/api/carts/{{user.cart._id}}" class="btn btn-info">Cart</a> </div>
-            {{else}}
-            <a href="/login" class="btn btn-info">Login</a>
+        <div><a href="/api/sessions/current" class="btn btn-info">Profile</a></div>
+        <div><a href="/api/carts/{{user.cart._id}}" class="btn btn-info">Cart</a></div>
+        {{#if (or (eq user.role 'admin') (eq user.role 'premium'))}}
+            <div><a href="/realTimeProducts" class="btn btnProducts btn-info">Adds</a></div>
+        {{/if}}
+    {{else}}
+        <a href="/login" class="btn btn-info">Login</a>
     {{/if}}
 </nav>

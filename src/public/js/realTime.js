@@ -25,7 +25,8 @@ function updateProductList(productList) {
                 <li>category: ${product.category}</li>
                 <li>status: ${product.status}</li>
                 <li>stock: ${product.stock}</li>
-                thumbnail: <img src="${product.thumbnail}" alt="img" class="img-thumbnail img-fluid">        </ul>
+                <li>Owner: ${product.owner}</li>
+                <img src="${product.thumbnail}" alt="img" class="img-thumbnail img-fluid">        </ul>
                 </p>
             </div>
             <div class="d-flex justify-content-center mb-4">
@@ -64,7 +65,7 @@ function updateProductList(productList) {
             status,
         };
 
-        console.log("Producto a enviar:", product); // Log para verificar que el producto se está creando correctamente
+        console.log("Producto a enviar:", product); 
 
         socketClient.emit("addProduct", { user, product });
 

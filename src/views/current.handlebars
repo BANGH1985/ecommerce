@@ -1,12 +1,51 @@
-<div class="text-center">   
-    <h2>Perfil de Usuario</h2>
+<div class="profile">
+    <!-- current.handlebars -->
+    <h1>Perfil de Usuario</h1>
+
     <p>Nombre: {{user.first_name}}</p>
     <p>Apellido: {{user.last_name}}</p>
-    <p>Edad: {{user.age}}</p>
-    <p>Tu Rol es: {{user.role}}</p>
-    <form action="/api/sessions/logout" method="POST">
-        <button class="btn btn-info" type="submit">Logout</button>
-        <a class="btn btn-info" href="/">Shop</a>
-    </form>
-    <a class="btn btn-warning" href="/api/sessions/change-role">Hacer premium</a>
+    <p>Email: {{user.email}}</p>
+    <p>Rol: {{user.role}}</p>
 </div>
+
+<!-- Botón de cambiar rol -->
+<form id="go-to-change-role-form" action="/api/sessions/change-role" method="GET">
+    <button type="submit">Cambiar Rol</button>
+</form>
+<!-- Botón de logout -->
+<form id="logout-form" action="/api/sessions/logout" method="POST">
+    <button type="submit">Logout</button>
+</form>
+
+
+<script>
+    document.getElementById('change-role-form').addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        const form = event.target;
+        const formData = new FormData(form);
+        const role = formData.get('role');
+
+        try {
+            const response = await fetch(form.action, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ role })
+            });
+
+            if (response.ok) {
+                let message = role === 'premium' ? '¡Felicidades! Ahora eres un usuario Premium.' : 'Has cambiado a un usuario estándar.';
+                alert(message);
+                window.location.href = '/api/sessions/current';
+            } else {
+                const errorData = await response.json();
+                alert(errorData.error || 'Error al cambiar el rol');
+            }
+        } catch (error) {
+            console.error('Error en fetch:', error);
+            alert('Error al cambiar el rol. Inténtalo de nuevo.');
+        }
+    });
+</script>

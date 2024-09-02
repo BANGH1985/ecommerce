@@ -23,6 +23,18 @@ export default class UserService {
         await userManager.savePasswordResetToken(userId, token, expires);
         return token;
     }
+
+    async updateLastConnection(userId) {
+        try {
+            return await userManager.updateLastConnection(userId);
+        } catch (error) {
+            console.error('Error al actualizar la última conexión:', error);
+            throw error;
+        }
+    }
+    async addUserDocuments(userId, documents) {
+        return await userManager.addUserDocuments(userId, documents);
+    }
     async findUserByResetToken(token) {
         return await userManager.findUserByResetToken(token);
     }

@@ -4,7 +4,7 @@ import Cart from '../models/carts.model.js';
 export default class UserManager {
     async findUserByEmail(email) {
         try {
-            return await User.findOne({ email }).lean(); // Utilizando lean() para convertir a objeto plano
+            return await User.findOne({ email }).lean(); 
         } catch (error) {
             console.error('Error al buscar usuario por email:', error);
             throw error;
@@ -15,7 +15,7 @@ export default class UserManager {
         try {
             const newUser = new User(userData);
             await newUser.save();
-            return newUser.toObject(); // Convertir a objeto plano
+            return newUser.toObject(); 
         } catch (error) {
             console.error('Error al crear usuario:', error);
             throw error;
@@ -26,7 +26,7 @@ export default class UserManager {
         try {
             const newCart = new Cart();
             await newCart.save();
-            return newCart.toObject(); // Convertir a objeto plano
+            return newCart.toObject(); 
         } catch (error) {
             console.error('Error al crear carrito:', error);
             throw error;
@@ -36,7 +36,7 @@ export default class UserManager {
     async updateUserCart(userId, cartId) {
         try {
             const updatedUser = await User.findByIdAndUpdate(userId, { cart: cartId }, { new: true });
-            return updatedUser.toObject(); // Convertir a objeto plano
+            return updatedUser.toObject(); 
         } catch (error) {
             console.error('Error al actualizar carrito del usuario:', error);
             throw error;
@@ -66,6 +66,28 @@ export default class UserManager {
         }
     }
 
+    async updateLastConnection(userId) {
+        try {
+            return await User.findByIdAndUpdate(userId, { last_connection: new Date() }, { new: true });
+        } catch (error) {
+            console.error('Error al actualizar la última conexión del usuario:', error);
+            throw error;
+        }
+    }
+
+    async addUserDocuments(userId, documents) {
+        try {
+            return await User.findByIdAndUpdate(
+                userId,
+                { $push: { documents: { $each: documents } } },
+                { new: true }
+            );
+        } catch (error) {
+            console.error('Error al agregar documentos al usuario:', error);
+            throw error;
+        }
+    }
+
     async updatePassword(userId, hashedPassword) {
         try {
             return await User.findByIdAndUpdate(userId, {
@@ -81,7 +103,7 @@ export default class UserManager {
 
     async findUserById(userId) {
         try {
-            return await User.findById(userId).lean(); // Utilizando lean() para convertir a objeto plano
+            return await User.findById(userId).lean(); 
         } catch (error) {
             console.error('Error al buscar usuario por ID:', error);
             throw error;

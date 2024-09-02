@@ -20,4 +20,8 @@ router.get('/login', isNotAuthenticated, viewsController.getLogin.bind(viewsCont
 // Ruta para la página de registro (solo usuarios no autenticados)
 router.get('/register', isNotAuthenticated, viewsController.getRegister.bind(viewsController));
 
+router.get('/upload-documents', isAuthenticated, (req, res) => {
+    res.render('uploadDocuments', { user: req.user });
+});
+
 export default router;

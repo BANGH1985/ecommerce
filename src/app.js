@@ -57,6 +57,12 @@ const hbs = handlebars.create({
     helpers: {
         json: function(context) {
             return JSON.stringify(context);
+        },
+        eq: function(a, b) {
+            return a === b;
+        },
+        or: function(v1, v2, options) {
+            return v1 || v2;
         }
     },
     runtimeOptions: {
