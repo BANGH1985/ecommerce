@@ -118,4 +118,21 @@ export default class UserManager {
             throw error;
         }
     }
+    async getAllUsers() {
+        try {
+            return await User.find().lean();
+        } catch (error) {
+            console.error('Error al obtener todos los usuarios:', error);
+            throw error;
+        }
+    }
+    
+    async deleteUser(userId) {
+        try {
+            return await User.findByIdAndDelete(userId);
+        } catch (error) {
+            console.error('Error al eliminar usuario:', error);
+            throw error;
+        }
+    }
 }

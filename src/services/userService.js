@@ -19,7 +19,7 @@ export default class UserService {
     }
     async generatePasswordResetToken(userId) {
         const token = crypto.randomBytes(20).toString('hex');
-        const expires = Date.now() + 3600000; // 1 hora
+        const expires = Date.now() + 3600000; 
         await userManager.savePasswordResetToken(userId, token, expires);
         return token;
     }
@@ -47,5 +47,11 @@ export default class UserService {
     }
     async updateUserRole(user) {
         return await userManager.updateUserRole(user);
+    }
+    async getAllUsers() {
+        return await userManager.getAllUsers();
+    }
+    async deleteUser(userId) {
+        return await userManager.deleteUser(userId);
     }
 }
