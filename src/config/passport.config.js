@@ -5,6 +5,7 @@ import userService from '../models/user.model.js'
 import cartService from '../models/carts.model.js'
 import User from '../models/user.model.js';
 import GitHubStrategy from 'passport-github2'
+import dotenv from 'dotenv'
 
 
 const initializePassport = () => {
@@ -28,9 +29,9 @@ const initializePassport = () => {
         }
     }));
     passport.use("github", new GitHubStrategy({
-        clientID: "Iv23li4OUCIT2M6fSVgF",
-        clientSecret: "c36b2e36ccea716f1804811bfd3fa524397a069c",
-        callbackURL: "http://localhost:8080/api/sessions/githubcallback"
+        clientID: process.env.GITHUB_CLIENT_ID,
+        clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        callbackURL: process.env.GITHUB_CALLBACK_URL
     }, async (accessToken, refreshToken, profile, done) => {
         try {
             let user = await userService.findOne({ email: profile._json.email });
@@ -39,11 +40,10 @@ const initializePassport = () => {
                     first_name: profile._json.name,
                     last_name: profile._json.name,
                     email: profile._json.email,
-                    age: 0, // O cualquier valor predeterminado si no está disponible
+                    age: 0, 
                     password: ""
                 };
                 let createdUser = await userService.create(newUser);
-                // Crear carrito después de que el usuario ha sido creado
                 let newCart = await cartService.create({ items: [], user: createdUser._id });
                 createdUser.cart = newCart._id;
                 await createdUser.save();
