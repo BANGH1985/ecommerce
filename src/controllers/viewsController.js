@@ -44,7 +44,6 @@ export default class ViewsController {
     async getRealTimeProducts(req, res) {
         try {
             const products = await productService.getProducts();
-            console.log(products);
             res.render('realtimeproducts', { products });
         } catch (error) {
             console.error('Error al obtener los productos en tiempo real:', error);
