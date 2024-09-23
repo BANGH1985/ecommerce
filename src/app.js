@@ -55,9 +55,7 @@ app.use((req, res, next) => {
 
 
 // Configuración de Express para renderizar vistas con handlebars
-app.engine('handlebars', hbs.engine);
-// Configuración de handlebars
-const hbs = handlebars.create({
+app.engine('handlebars', engine({   
     helpers: {
         json: function(context) {
             return JSON.stringify(context);
@@ -73,7 +71,7 @@ const hbs = handlebars.create({
         allowProtoPropertiesByDefault: true,
         allowProtoMethodsByDefault: true,
     }
-});
+}));
 app.set('view engine', 'handlebars')
 app.set('views', path.join(__dirname, '/views'));
 
