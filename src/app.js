@@ -1,7 +1,7 @@
 import express from 'express';
 import path from 'path'
 import { __dirname } from './utils.js';
-import handlebars from 'express-handlebars';
+import { engine } from 'express-handlebars';
 import { Server } from 'socket.io';
 import session from 'express-session';
 import MongoStore from 'connect-mongo';
