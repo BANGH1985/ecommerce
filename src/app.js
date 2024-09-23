@@ -45,7 +45,7 @@ app.use(passport.session());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 // Middleware para pasar la información del usuario a las vistas
 app.use((req, res, next) => {
@@ -53,6 +53,9 @@ app.use((req, res, next) => {
     next();
 });
 
+
+// Configuración de Express para renderizar vistas con handlebars
+app.engine('handlebars', hbs.engine);
 // Configuración de handlebars
 const hbs = handlebars.create({
     helpers: {
@@ -71,11 +74,8 @@ const hbs = handlebars.create({
         allowProtoMethodsByDefault: true,
     }
 });
-
-// Configuración de Express para renderizar vistas con handlebars
-app.engine('handlebars', hbs.engine);
-app.set('views', path.join(__dirname, 'views'));
-app.set('views', __dirname + '/views');
+app.set('view engine', 'handlebars')
+app.set('views', path.join(__dirname, '/views'));
 
 // Rutas
 app.use('/', viewsRoutes);
