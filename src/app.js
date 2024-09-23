@@ -1,4 +1,5 @@
 import express from 'express';
+import path from 'path'
 import { __dirname } from './utils.js';
 import handlebars from 'express-handlebars';
 import { Server } from 'socket.io';
@@ -44,7 +45,7 @@ app.use(passport.session());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware para pasar la información del usuario a las vistas
 app.use((req, res, next) => {
@@ -73,7 +74,7 @@ const hbs = handlebars.create({
 
 // Configuración de Express para renderizar vistas con handlebars
 app.engine('handlebars', hbs.engine);
-app.set('view engine', 'handlebars');
+app.set('views', path.join(__dirname, 'views'));
 app.set('views', __dirname + '/views');
 
 // Rutas
